@@ -47,27 +47,34 @@ const uint32_t crc32_tabl[] =
 
 class LMP_Device
 {
-    LMP_Device();
-    ~LMP_Device();
+    public:
+        LMP_Device();
+        LMP_Device(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr));
+        ~LMP_Device();
+        void Send_Data(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr));
+        void Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t size);
+        uint32_t crc32_compute(const void* buf, unsigned long size);
+        uint8_t check(PacketBase* pack);
+        uint8_t put(uint8_t b);
+        uint8_t Receive_Process(void(*ptrRecognisePacket)(PacketBase* buf), uint8_t inputBufferByte);
+        uint8_t parseCycle(void (*ptrRecognisePacket)(PacketBase* buf));
+        uint8_t parse();
+        uint8_t refind_preamble(int start);
+        void Set_Algorithm(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr), uint8_t algorithm_register_value);
+        uint8_t GetInputPacketType();
+        void SetSendDataFunction(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr));
+        void clear() { CTR = 0;}
 	private:
-        uint8_t InputPacket[sizeof(PacketBase)];
-	    PacketBase *Output_Packet;
+        uint8_t InputPacket[sizeof(PacketBase)] = { 0 };
+	    PacketBase *Output_Packet = new PacketBase;
         uint32_t CTR=0;
+        void(*ptrSendFun)(PacketBase* Output_Packet_Ptr);
         enum EStatus
         {
             NOT_ENOUGH,
             REFIND_PREAMBLE,
             CHECK_OK,
         };
-	public:
-        void Send_Data(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr));
-		void Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t size);
-        uint32_t crc32_compute(const void* buf, unsigned long size);
-        uint8_t check(PacketBase* pack);
-        uint8_t put(uint8_t b);
-        uint8_t Receive_Process(void(*ptrRecognisePacket)(PacketBase* buf), uint8_t inputBufferByte);
-        uint8_t parseCycle(void (*ptrRecognisePacket)(PacketBase* buf)); 
-        uint8_t parse();
-        uint8_t refind_preamble(int start);
+
 };
 #endif

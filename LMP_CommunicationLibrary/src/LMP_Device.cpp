@@ -1,27 +1,21 @@
 #include "LMP_Device.h"
 #include <string.h>
 
-//LMP_Device::LMP_Device()
-//{
-//
-//}
-//
-//LMP_Device::~LMP_Device()
-//{
-//
-//}
-
-
-/**
-  * @name	Send_Data
-  * @brief  Function run void callback function that sending data to serial interface connected to GKV
-  * @param  ptrSendPacketFun - pointer on void-type callback function that gets pointer on PacketBase structure and sends "length" fiels + 8 bytes
-  * @param  Output_Packet_Ptr - pointer on beginning of base packet structure that should be transmitted to GKV (pointer on full transmitting packet)
-  * @retval no return value.
-  */
-void LMP_Device::Send_Data(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr))
+LMP_Device::LMP_Device()
 {
-	ptrSendPacketFun(Output_Packet);
+
+}
+
+
+LMP_Device::~LMP_Device()
+{
+
+}
+
+
+void  LMP_Device::SetSendDataFunction(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr))
+{
+	ptrSendFun = ptrSendPacketFun;
 }
 /**
   * @name	Configure_Output_Packet
@@ -42,6 +36,37 @@ void LMP_Device::Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t s
 	memcpy(Output_Packet->data, data_ptr, size);
 	*((uint32_t*)&Output_Packet->data[size]) = crc32_compute(Output_Packet, Output_Packet->length + 4);
 }
+
+/**
+  * @name	Send_Data
+  * @brief  Function run void callback function that sending data to serial interface connected to GKV
+  * @param  ptrSendPacketFun - pointer on void-type callback function that gets pointer on PacketBase structure and sends "length" fiels + 8 bytes
+  * @param  Output_Packet_Ptr - pointer on beginning of base packet structure that should be transmitted to GKV (pointer on full transmitting packet)
+  * @retval no return value.
+  */
+void LMP_Device::Send_Data(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr))
+{
+	ptrSendPacketFun(Output_Packet);
+}
+
+void LMP_Device::Set_Algorithm(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr), uint8_t algorithm_register_value)
+{
+	PacketBase Output_Packet;
+	Settings GKV_Settings;
+	memset(&GKV_Settings, 0, sizeof(GKV_Settings));
+	uint8_t type = GKV_DEV_SETTINGS_PACKET;
+
+	if (algorithm_register_value <= ESKF5_NAVIGATON_ALGORITHM)
+	{
+		GKV_Settings.param_mask |= CHANGE_ALGORITHM;
+		GKV_Settings.algorithm = algorithm_register_value;
+	}
+	Configure_Output_Packet(type, &GKV_Settings, sizeof(GKV_Settings));
+	Send_Data(ptrSendPacketFun);
+}
+
+
+
 
 /**
   * @name	crc32_compute
@@ -118,8 +143,8 @@ uint8_t LMP_Device::put(uint8_t b)//проверка на преамбулу
 		}
 	}
 
-
-	InputPacket[CTR++] = b;
+	*((uint8_t*)(&InputPacket)+CTR) = b;
+	CTR++;
 	return 1;
 }
 
@@ -133,9 +158,6 @@ uint8_t LMP_Device::put(uint8_t b)//проверка на преамбулу
   */
 uint8_t LMP_Device::Receive_Process(void (*ptrRecognisePacket)(PacketBase* buf), uint8_t inputBufferByte)
 {
-	uint32_t* ptr_cnt = (uint32_t*)&(CTR);
-	PacketBase* ptr_buf = (PacketBase*)&InputPacket;
-
 	if (put(inputBufferByte))
 	{
 		return parseCycle(ptrRecognisePacket);
@@ -172,7 +194,7 @@ uint8_t LMP_Device::parseCycle(void (*ptrRecognisePacket)(PacketBase* buf))
 		else if (status == CHECK_OK)
 		{
 			ptrRecognisePacket(((PacketBase*)&InputPacket));
-			if (!refind_preamble(((PacketBase*)&InputPacket)->length) + 8)
+			if (!refind_preamble(((PacketBase*)&InputPacket)->length + 8))
 				break;
 		}
 	}
@@ -238,4 +260,9 @@ uint8_t LMP_Device::parse()
 	}
 
 	return CHECK_OK;
+}
+
+uint8_t LMP_Device::GetInputPacketType()
+{
+	return (((PacketBase*)&InputPacket)->type);
 }
