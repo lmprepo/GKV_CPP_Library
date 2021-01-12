@@ -1,6 +1,8 @@
 #ifndef LMP_DEVICE_H
 #define LMP_DEVICE_H
 #include <stdint.h>
+#include <iostream>
+#include <thread>
 #include "LMP_BasePacket.h"
 #include "LMP_TestPacket.h"
 #include "LMP_SettingsPacket.h"
@@ -51,6 +53,7 @@ class LMP_Device
         LMP_Device();
         LMP_Device(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr));
         ~LMP_Device();
+        void RunDevice();
         void Send_Data();
         void Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t size);
         uint32_t crc32_compute(const void* buf, unsigned long size);
@@ -67,19 +70,23 @@ class LMP_Device
         void SetSettingsReceivedCallback(void(*ptrReceivedPacketProcessingFun)(Settings* settings));
 
         void SetReceiveDataFunction(char(*ptrRecPacketFun)());
-
         void clear() { CTR = 0;}
 
+        //LMP_Device() : writer{ &LMP_Device::dataNewThreadReceiveFcn, this };
+
 	private:
+
+        void dataNewThreadReceiveFcn();
+        void RecognisePacket(PacketBase* buf);
+
+        std::thread Receiver;
+
         uint8_t InputPacket[sizeof(PacketBase)] = { 0 };
-	    PacketBase *Output_Packet = new PacketBase;
-        uint32_t CTR=0;
-        void(*ptrSendFun)(PacketBase* Output_Packet_Ptr)=NULL;
+        PacketBase* Output_Packet = new PacketBase;
+        uint32_t CTR = 0;
+        void(*ptrSendFun)(PacketBase* Output_Packet_Ptr) = NULL;
         void(*ptrPacketProcessingFun)(PacketBase* Input_Packet_Ptr) = NULL;
         void(*ptrSettingsPacketProcessingFun)(Settings* settings) = NULL;
-
-        
-        void RecognisePacket(PacketBase* buf);
 
         char (*ptrRecFcn)(void) = NULL;
         enum EStatus

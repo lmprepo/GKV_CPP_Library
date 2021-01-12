@@ -298,8 +298,6 @@ uint8_t LMP_Device::GetInputPacketType()
 	return (((PacketBase*)&InputPacket)->type);
 }
 
-
-
 void LMP_Device::RecognisePacket(PacketBase* buf)
 {
 
@@ -351,4 +349,18 @@ void LMP_Device::RecognisePacket(PacketBase* buf)
     }
 
     }
+}
+
+void LMP_Device::dataNewThreadReceiveFcn()
+{
+	while (1)
+	{
+		Receive_Process();
+	}
+}
+
+void LMP_Device::RunDevice()
+{
+	std::thread Receiver(&LMP_Device::dataNewThreadReceiveFcn, this);
+	Receiver.detach();
 }

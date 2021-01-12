@@ -26,10 +26,10 @@ int main()
     uint8_t algorithm = ADC_CODES_ALGORITHM;
     uint8_t algorithm_packet = GKV_ADC_CODES_PACKET;
     uint8_t algorithm_selected = 0;
-
-
+    
     GKV->SetReceivedPacketCallback(RecognisePacket);
     GKV->SetReceiveDataFunction(ReadCOM);
+
 
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
@@ -56,22 +56,17 @@ int main()
     dcbSerialParams.ByteSize = 8;
     dcbSerialParams.StopBits = ONESTOPBIT;
     dcbSerialParams.Parity = NOPARITY;
-    const int MAX_INCORRECT_CNT = 1000;
+    GKV->RunDevice();
+   // std::thread Receiver(dataNewThreadReceiveFcn);
     cout << "#start read loop\n";
-    std::thread thread(dataNewThreadReceiveFcn); 
     while (1)
     {
+        Sleep(50);
+        cout << "#do something\n";
     }
     return 0;
 }
 
-void dataNewThreadReceiveFcn()
-{
-    while (1)
-    {
-        GKV->Receive_Process();
-    }
-}
 
 char ReadCOM()
 {

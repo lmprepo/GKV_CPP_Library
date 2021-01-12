@@ -26,6 +26,7 @@ int main()
 
     LMP_Device *GKV = new LMP_Device();
     GKV->SetSendDataFunction(WriteCOM);
+    GKV->SetReceiveDataFunction(ReadCOM);
     GKV->SetReceivedPacketCallback(RecognisePacket);
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
@@ -54,20 +55,10 @@ int main()
     dcbSerialParams.Parity = NOPARITY;
     const int MAX_INCORRECT_CNT = 1000;
     int incorrectCnt = 0;
+    GKV->RunDevice();
     while (!(algorithm_selected))
     {
         GKV->Set_Algorithm(algorithm);
-        Packet_is_Correct = 0;
-        while (!(Packet_is_Correct))
-        {
-            Packet_is_Correct=GKV->Receive_Process();
-            incorrectCnt++;
-            if (incorrectCnt > MAX_INCORRECT_CNT)
-            {
-                cout << "error too many incorrect packets\n";
-                return 1;
-            }
-        }
         if (GKV->GetInputPacketType() == algorithm_packet)
         {
             algorithm_selected = 1;
@@ -76,7 +67,6 @@ int main()
     cout << "#start read loop\n";
     while (1)
     {
-        GKV->Receive_Process();
     }
     return 0;
 }
