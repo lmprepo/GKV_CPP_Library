@@ -17,14 +17,23 @@ void  LMP_Device::SetSendDataFunction(void(*ptrSendPacketFun)(PacketBase* Output
 	ptrSendFun = ptrSendPacketFun;
 }
 
-void  LMP_Device::SetReceivedPacketProcessingFunction(void(*ptrReceivedPacketProcessingFun)(PacketBase* Input_Packet_Ptr))
+void  LMP_Device::SetReceivedPacketCallback(void(*ptrReceivedPacketProcessingFun)(PacketBase* Input_Packet_Ptr))
 {
 	ptrPacketProcessingFun = ptrReceivedPacketProcessingFun;
 }
 
+void LMP_Device::SetSettingsReceivedCallback(void(*ptrReceivedPacketProcessingFun)(Settings* settings))
+{
+	ptrSettingsPacketProcessingFun = ptrReceivedPacketProcessingFun;
+}
+
+
+
 void  LMP_Device::SetReceiveDataFunction(char(*ptrRecPacketFun)())
 {
+	ptrRecFcn = ptrRecPacketFun;
 }
+
 /**
   * @name	Configure_Output_Packet
   * @brief  Function inserts selected packet structure into base packet structure, sets values for basic fields and computes crc32.
@@ -36,7 +45,6 @@ void  LMP_Device::SetReceiveDataFunction(char(*ptrRecPacketFun)())
   */
 void LMP_Device::Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t size)
 {
-
 	Output_Packet->preamble = 0xFF;
 	Output_Packet->address = 0x01;
 	Output_Packet->type = type;
@@ -54,7 +62,10 @@ void LMP_Device::Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t s
   */
 void LMP_Device::Send_Data()
 {
-	ptrSendFun(Output_Packet);
+	if (ptrSendFun)
+	{
+		ptrSendFun(Output_Packet);
+	}
 }
 
 void LMP_Device::Set_Algorithm(uint8_t algorithm_register_value)
@@ -124,12 +135,12 @@ uint8_t LMP_Device::check(PacketBase* pack)
 
 }
 
-
-/*------------------------------Receiving_Data_Parser----------------------------------------------------------------------*/
-
-#define NOT_ENOUGH				0x00
-#define REFIND_PREAMBLE			0x01
-#define CHECK_OK				0x02
+//
+///*------------------------------Receiving_Data_Parser----------------------------------------------------------------------*/
+//
+//#define NOT_ENOUGH				0x00
+//#define REFIND_PREAMBLE			0x01
+//#define CHECK_OK				0x02
 
 
 
@@ -164,9 +175,14 @@ uint8_t LMP_Device::put(uint8_t b)//проверка на преамбулу
   * @param  ptrInputStructure - pointer on structure includes current byte value, byte counter and full structure of receiving packet
   * @retval function returns result of searching correct packet. 0x00 - not enough bytes received, 0x01 - checksum is incorrect, 0x02 - packet checked
   */
-uint8_t LMP_Device::Receive_Process(char inputBufferByte)
+uint8_t LMP_Device::Receive_Process()
 {
-	if (put(inputBufferByte))
+	char buffer_byte=0;
+	if (ptrRecFcn)
+	{
+		 buffer_byte = (*ptrRecFcn)();
+	}
+	if (put(buffer_byte))
 	{
 		return parseCycle();
 	}
@@ -201,7 +217,14 @@ uint8_t LMP_Device::parseCycle()
 		}
 		else if (status == CHECK_OK)
 		{
-			ptrPacketProcessingFun(((PacketBase*)&InputPacket));
+			if(ptrPacketProcessingFun)
+			{
+				ptrPacketProcessingFun(((PacketBase*)&InputPacket));
+			}
+			else
+			{
+				RecognisePacket(((PacketBase*)&InputPacket));
+			}
 			if (!refind_preamble(((PacketBase*)&InputPacket)->length + 8))
 				break;
 		}
@@ -273,4 +296,59 @@ uint8_t LMP_Device::parse()
 uint8_t LMP_Device::GetInputPacketType()
 {
 	return (((PacketBase*)&InputPacket)->type);
+}
+
+
+
+void LMP_Device::RecognisePacket(PacketBase* buf)
+{
+
+    switch (buf->type)
+    {
+    case GKV_ADC_CODES_PACKET:
+    {
+        ADCData* packet;
+        packet = (ADCData*)&buf->data;
+
+        break;
+    }
+    case GKV_RAW_DATA_PACKET:
+    {
+        RawData* packet;
+        packet = (RawData*)&buf->data;
+        break;
+    }
+    case GKV_EULER_ANGLES_PACKET:
+    {
+        GyrovertData* packet;
+        packet = (GyrovertData*)&buf->data;
+
+        break;
+    }
+    case GKV_INCLINOMETER_PACKET:
+    {
+        InclinometerData* packet;
+        packet = (InclinometerData*)&buf->data;
+        break;
+    }
+    case GKV_BINS_PACKET:
+    {
+        BINSData* packet;
+        packet = (BINSData*)&buf->data;
+        break;
+    }
+    case GKV_GNSS_PACKET:
+    {
+        GpsData* packet;
+        packet = (GpsData*)&buf->data;
+        break;
+    }
+    case GKV_CUSTOM_PACKET:
+    {
+        CustomData* packet;
+        packet = (CustomData*)&buf->data;
+        break;
+    }
+
+    }
 }

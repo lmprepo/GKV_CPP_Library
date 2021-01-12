@@ -1,6 +1,7 @@
 ﻿
 #include <windows.h>
 #include <iostream>
+#include <thread>
 #include <stdio.h>
 #include "LMP_Device.h"
 using namespace std;
@@ -9,6 +10,10 @@ HANDLE hSerial;
 
 char ReadCOM();
 void RecognisePacket(PacketBase* buf);
+void dataNewThreadReceiveFcn();
+
+LMP_Device* GKV = new LMP_Device();
+
 
 int main()
 {
@@ -22,8 +27,10 @@ int main()
     uint8_t algorithm_packet = GKV_ADC_CODES_PACKET;
     uint8_t algorithm_selected = 0;
 
-    LMP_Device *GKV = new LMP_Device();
-    GKV->SetReceivedPacketProcessingFunction(RecognisePacket);
+
+    GKV->SetReceivedPacketCallback(RecognisePacket);
+    GKV->SetReceiveDataFunction(ReadCOM);
+
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hSerial == INVALID_HANDLE_VALUE)
@@ -51,11 +58,19 @@ int main()
     dcbSerialParams.Parity = NOPARITY;
     const int MAX_INCORRECT_CNT = 1000;
     cout << "#start read loop\n";
+    std::thread thread(dataNewThreadReceiveFcn); 
     while (1)
     {
-        GKV->Receive_Process(ReadCOM());
     }
     return 0;
+}
+
+void dataNewThreadReceiveFcn()
+{
+    while (1)
+    {
+        GKV->Receive_Process();
+    }
 }
 
 char ReadCOM()
@@ -217,7 +232,6 @@ void RecognisePacket(PacketBase* buf)
             {
                 cout << "param = NaN ";
             }
-
         }
         cout << endl;
         break;

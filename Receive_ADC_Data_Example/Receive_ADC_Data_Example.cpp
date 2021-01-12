@@ -26,7 +26,7 @@ int main()
 
     LMP_Device *GKV = new LMP_Device();
     GKV->SetSendDataFunction(WriteCOM);
-    GKV->SetReceivedPacketProcessingFunction(RecognisePacket);
+    GKV->SetReceivedPacketCallback(RecognisePacket);
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hSerial == INVALID_HANDLE_VALUE)
@@ -60,7 +60,7 @@ int main()
         Packet_is_Correct = 0;
         while (!(Packet_is_Correct))
         {
-            Packet_is_Correct=GKV->Receive_Process(ReadCOM());
+            Packet_is_Correct=GKV->Receive_Process();
             incorrectCnt++;
             if (incorrectCnt > MAX_INCORRECT_CNT)
             {
@@ -76,7 +76,7 @@ int main()
     cout << "#start read loop\n";
     while (1)
     {
-        GKV->Receive_Process(ReadCOM());
+        GKV->Receive_Process();
     }
     return 0;
 }
