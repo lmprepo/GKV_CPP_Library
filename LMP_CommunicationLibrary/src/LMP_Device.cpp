@@ -17,6 +17,11 @@ void  LMP_Device::SetSendDataFunction(void(*ptrSendPacketFun)(PacketBase* Output
 	ptrSendFun = ptrSendPacketFun;
 }
 
+void  LMP_Device::SetReceivedPacketProcessingFunction(void(*ptrReceivedPacketProcessingFun)(PacketBase* Input_Packet_Ptr))
+{
+	ptrPacketProcessingFun = ptrReceivedPacketProcessingFun;
+}
+
 void  LMP_Device::SetReceiveDataFunction(char(*ptrRecPacketFun)())
 {
 }
@@ -159,11 +164,11 @@ uint8_t LMP_Device::put(uint8_t b)//проверка на преамбулу
   * @param  ptrInputStructure - pointer on structure includes current byte value, byte counter and full structure of receiving packet
   * @retval function returns result of searching correct packet. 0x00 - not enough bytes received, 0x01 - checksum is incorrect, 0x02 - packet checked
   */
-uint8_t LMP_Device::Receive_Process(void (*ptrRecognisePacket)(PacketBase* buf), char inputBufferByte)
+uint8_t LMP_Device::Receive_Process(char inputBufferByte)
 {
 	if (put(inputBufferByte))
 	{
-		return parseCycle(ptrRecognisePacket);
+		return parseCycle();
 	}
 	return 0;
 }
@@ -179,7 +184,7 @@ uint8_t LMP_Device::Receive_Process(void (*ptrRecognisePacket)(PacketBase* buf),
   * @param  buf - pointer on beginning of input packet buffer
   * @retval function returns result of searching correct packet. 0x00 - not enough bytes received, 0x01 - checksum is incorrect, 0x02 - packet checked
   */
-uint8_t LMP_Device::parseCycle(void (*ptrRecognisePacket)(PacketBase* buf))
+uint8_t LMP_Device::parseCycle()
 {
 	uint8_t status = 0;
 	while (1)
@@ -196,7 +201,7 @@ uint8_t LMP_Device::parseCycle(void (*ptrRecognisePacket)(PacketBase* buf))
 		}
 		else if (status == CHECK_OK)
 		{
-			ptrRecognisePacket(((PacketBase*)&InputPacket));
+			ptrPacketProcessingFun(((PacketBase*)&InputPacket));
 			if (!refind_preamble(((PacketBase*)&InputPacket)->length + 8))
 				break;
 		}
