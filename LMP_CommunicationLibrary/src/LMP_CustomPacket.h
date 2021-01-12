@@ -54,8 +54,8 @@
   */
 typedef struct __CustomData
 {
-	uint8_t number_of_parameters;           /*	number of parameters that device sends in custom packet	*/
-	float paramerer[65];                    /*	value of parameter N from list of 'custom_data_parameters'	*/
+	//uint8_t number_of_parameters;           /*	number of parameters that device sends in custom packet	*/
+	float parameter[65];                    /*	value of parameter N from list of 'custom_data_parameters'	*/
 }CustomData;
 
 

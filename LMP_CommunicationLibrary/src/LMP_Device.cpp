@@ -3,7 +3,6 @@
 
 LMP_Device::LMP_Device()
 {
-
 }
 
 
@@ -16,6 +15,10 @@ LMP_Device::~LMP_Device()
 void  LMP_Device::SetSendDataFunction(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr))
 {
 	ptrSendFun = ptrSendPacketFun;
+}
+
+void  LMP_Device::SetReceiveDataFunction(char(*ptrRecPacketFun)())
+{
 }
 /**
   * @name	Configure_Output_Packet
@@ -44,12 +47,12 @@ void LMP_Device::Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t s
   * @param  Output_Packet_Ptr - pointer on beginning of base packet structure that should be transmitted to GKV (pointer on full transmitting packet)
   * @retval no return value.
   */
-void LMP_Device::Send_Data(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr))
+void LMP_Device::Send_Data()
 {
-	ptrSendPacketFun(Output_Packet);
+	ptrSendFun(Output_Packet);
 }
 
-void LMP_Device::Set_Algorithm(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr), uint8_t algorithm_register_value)
+void LMP_Device::Set_Algorithm(uint8_t algorithm_register_value)
 {
 	PacketBase Output_Packet;
 	Settings GKV_Settings;
@@ -62,7 +65,7 @@ void LMP_Device::Set_Algorithm(void(*ptrSendPacketFun)(PacketBase* Output_Packet
 		GKV_Settings.algorithm = algorithm_register_value;
 	}
 	Configure_Output_Packet(type, &GKV_Settings, sizeof(GKV_Settings));
-	Send_Data(ptrSendPacketFun);
+	Send_Data();
 }
 
 
@@ -156,7 +159,7 @@ uint8_t LMP_Device::put(uint8_t b)//проверка на преамбулу
   * @param  ptrInputStructure - pointer on structure includes current byte value, byte counter and full structure of receiving packet
   * @retval function returns result of searching correct packet. 0x00 - not enough bytes received, 0x01 - checksum is incorrect, 0x02 - packet checked
   */
-uint8_t LMP_Device::Receive_Process(void (*ptrRecognisePacket)(PacketBase* buf), uint8_t inputBufferByte)
+uint8_t LMP_Device::Receive_Process(void (*ptrRecognisePacket)(PacketBase* buf), char inputBufferByte)
 {
 	if (put(inputBufferByte))
 	{

@@ -8,12 +8,10 @@ using namespace std;
 HANDLE hSerial;
 
 char ReadCOM();
-void WriteCOM(PacketBase* buf);
 void RecognisePacket(PacketBase* buf);
 
 int main()
 {
-
     string com_port;
     cout << "Set Serial Port:";
     cin >> com_port;
@@ -25,7 +23,6 @@ int main()
     uint8_t algorithm_selected = 0;
 
     LMP_Device *GKV = new LMP_Device();
-    GKV->SetSendDataFunction(WriteCOM);
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hSerial == INVALID_HANDLE_VALUE)
@@ -52,39 +49,12 @@ int main()
     dcbSerialParams.StopBits = ONESTOPBIT;
     dcbSerialParams.Parity = NOPARITY;
     const int MAX_INCORRECT_CNT = 1000;
-    int incorrectCnt = 0;
-    while (!(algorithm_selected))
-    {
-        GKV->Set_Algorithm(algorithm);
-        Packet_is_Correct = 0;
-        while (!(Packet_is_Correct))
-        {
-            Packet_is_Correct=GKV->Receive_Process(RecognisePacket,ReadCOM());
-            incorrectCnt++;
-            if (incorrectCnt > MAX_INCORRECT_CNT)
-            {
-                cout << "error too many incorrect packets\n";
-                return 1;
-            }
-        }
-        if (GKV->GetInputPacketType() == algorithm_packet)
-        {
-            algorithm_selected = 1;
-        }
-    }
     cout << "#start read loop\n";
     while (1)
     {
         GKV->Receive_Process(RecognisePacket, ReadCOM());
     }
     return 0;
-}
-
-
-void WriteCOM(PacketBase* buf)
-{
-    DWORD dwBytesWritten;
-    char iRet = WriteFile(hSerial, buf, buf->length + 8, &dwBytesWritten, NULL);
 }
 
 char ReadCOM()
@@ -109,7 +79,8 @@ void RecognisePacket(PacketBase* buf)
     {
         ADCData* packet;
         packet = (ADCData*)&buf->data;
-        sprintf(str, "%d", packet->sample_cnt);
+        cout << "ADC Data Packet: ";
+        sprintf_s(str, "%d", packet->sample_cnt);
         cout << "Sample Counter = " << str << ' ';
         sprintf_s(str, "%d", packet->a[0]);
         cout << "ax = " << str << ' ';
@@ -129,6 +100,7 @@ void RecognisePacket(PacketBase* buf)
     {
         RawData* packet;
         packet = (RawData*)&buf->data;
+        cout << "Raw Sensors Data Packet: ";
         sprintf_s(str, "%d", packet->sample_cnt);
         cout << "Sample Counter = " << str << ' ';
         sprintf_s(str, "%f", packet->a[0]);
@@ -145,12 +117,95 @@ void RecognisePacket(PacketBase* buf)
         cout << "wz = " << str << endl;
         break;
     }
+    case GKV_EULER_ANGLES_PACKET:
+    {
+        GyrovertData* packet;
+        packet = (GyrovertData*)&buf->data;
+        cout << "Gyrovert Data Packet: ";
+        sprintf_s(str, "%d", packet->sample_cnt);
+        cout << "Sample Counter = " << str << ' ';
+        sprintf_s(str, "%f", packet->yaw);
+        cout << "yaw = " << str << ' ';
+        sprintf_s(str, "%f", packet->pitch);
+        cout << "pitch = " << str << ' ';
+        sprintf_s(str, "%f", packet->roll);
+        cout << "roll = " << str << endl;
+        break;
+    }
+    case GKV_INCLINOMETER_PACKET:
+    {
+        InclinometerData* packet;
+        packet = (InclinometerData*)&buf->data;
+        sprintf_s(str, "%d", packet->sample_cnt);
+        cout << "Sample Counter = " << str << ' ';
+        sprintf_s(str, "%f", packet->alfa);
+        cout << "alfa = " << str << ' ';
+        sprintf_s(str, "%f", packet->beta);
+        cout << "beta = " << str << endl;
+        break;
+    }
+    case GKV_BINS_PACKET:
+    {
+        BINSData* packet;
+        packet = (BINSData*)&buf->data;
+        cout << "BINS Data Packet: ";
+        sprintf_s(str, "%d", packet->sample_cnt);
+        cout << "Sample Counter = " << str << ' ';
+        sprintf_s(str, "%f", packet->x);
+        cout << "x = " << str << ' ';
+        sprintf_s(str, "%f", packet->y);
+        cout << "y = " << str << ' ';
+        sprintf_s(str, "%f", packet->z);
+        cout << "z = " << str << ' ';
+        sprintf_s(str, "%f", packet->alfa);
+        cout << "alfa = " << str << ' ';
+        sprintf_s(str, "%f", packet->beta);
+        cout << "beta = " << str << ' ';
+        sprintf_s(str, "%f", packet->q[0]);
+        cout << "q0 = " << str << ' ';
+        sprintf_s(str, "%f", packet->q[1]);
+        cout << "q1 = " << str << ' ';
+        sprintf_s(str, "%f", packet->q[2]);
+        cout << "q2 = " << str << ' ';
+        sprintf_s(str, "%f", packet->q[3]);
+        cout << "q3 = " << str << ' ';
+        sprintf_s(str, "%f", packet->yaw);
+        cout << "yaw = " << str << ' ';
+        sprintf_s(str, "%f", packet->pitch);
+        cout << "pitch = " << str << ' ';
+        sprintf_s(str, "%f", packet->roll);
+        cout << "roll = " << str << endl;
+        break;
+    }
+    case GKV_GNSS_PACKET:
+    {
+        GpsData* packet;
+        packet = (GpsData*)&buf->data;
+        cout << "GNSS Data Packet: ";
+        sprintf_s(str, "%f", packet->time);
+        cout << "time = " << str << ' ';
+        sprintf_s(str, "%f", packet->latitude);
+        cout << "latitude = " << str << ' ';
+        sprintf_s(str, "%f", packet->longitude);
+        cout << "longitude = " << str << ' ';
+        sprintf_s(str, "%f", packet->altitude);
+        cout << "altitude = " << str << ' ';
+        sprintf_s(str, "%d", packet->state_status);
+        cout << "state_status = " << str << ' ';
+        sprintf_s(str, "%f", packet->TDOP);
+        cout << "TDOP = " << str << ' ';
+        sprintf_s(str, "%f", packet->HDOP);
+        cout << "HDOP = " << str << ' ';
+        sprintf_s(str, "%f", packet->VDOP);
+        cout << "VDOP = " << str << endl;
+        break;
+    }
     case GKV_CUSTOM_PACKET:
     {
         CustomData* packet;
         packet = (CustomData*)&buf->data;
         cout << "CustomPacket: ";
-        for (uint8_t i = 0; i < ((buf->length) / 4); i++)
+        for (uint8_t i = 0; i < ((buf->length)/4); i++)
         {
             if (packet->parameter[i] == packet->parameter[i])// проверка на isnan
             {
