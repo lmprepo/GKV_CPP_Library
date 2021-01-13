@@ -271,6 +271,7 @@ typedef struct __GetSettings {} GetSettings;
 /** 
   * @brief  Packet 0x07 with gkv device settings (send/receive)
   */
+#pragma pack(push, 1)
 typedef struct __Settings
 {
 	uint32_t mode_mask;                     /*	field to allow change data format parameters	*/
@@ -290,6 +291,7 @@ typedef struct __Settings
 	uint8_t magnetometer_range;             /*	range of three axis magnetic sensor */
 	uint8_t ext_sync_mode;                  /*	??????????	*/
 }Settings;
+#pragma pack(pop)
 
 
 

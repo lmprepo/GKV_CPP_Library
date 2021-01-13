@@ -24,16 +24,63 @@ void  LMP_Device::SetReceivedPacketCallback(void(*ptrReceivedPacketProcessingFun
 
 void LMP_Device::SetSettingsReceivedCallback(void(*ptrReceivedPacketProcessingFun)(Settings* settings))
 {
-	ptrSettingsPacketProcessingFun = ptrReceivedPacketProcessingFun;
+	ptrSettingsPacketCallback = ptrReceivedPacketProcessingFun;
 }
-
-
 
 void  LMP_Device::SetReceiveDataFunction(char(*ptrRecPacketFun)())
 {
 	ptrRecFcn = ptrRecPacketFun;
 }
 
+void LMP_Device::SetCustomPacketParamReceivedCallback(void(*ptrReceivedPacketProcessingFun)(CustomDataParam* param))
+{
+	ptrCustomPacketParamCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetCustomPacketReceivedCallback(void(*ptrReceivedPacketProcessingFun)(CustomData* data))
+{
+	ptrCustomDataPacketCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetADCDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(ADCData* data))
+{
+	ptrADCPacketCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetRawDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(RawData* data))
+{
+	ptrRawDataPacketCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetGyrovertDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GyrovertData* data))
+{
+	ptrGyrovertDataPacketCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetInclinometerDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(InclinometerData* data))
+{
+	ptrInclinometerDataPacketCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetBINSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(BINSData* data))
+{
+	ptrBINSDataPacketCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetBINS2DataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(BINS2Data* data))
+{
+	ptrBINS2DataPacketCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GpsData* data))
+{
+	ptrGNSSDataPacketCallback = ptrReceivedPacketProcessingFun;
+}
+
+void LMP_Device::SetExtGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GpsDataExt* data))
+{
+	ptrExtGNSSDataPacketCallback = ptrReceivedPacketProcessingFun;
+}
 /**
   * @name	Configure_Output_Packet
   * @brief  Function inserts selected packet structure into base packet structure, sets values for basic fields and computes crc32.
@@ -49,7 +96,10 @@ void LMP_Device::Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t s
 	Output_Packet->address = 0x01;
 	Output_Packet->type = type;
 	Output_Packet->length = size;
-	memcpy(Output_Packet->data, data_ptr, size);
+	if (size)
+	{
+		memcpy(Output_Packet->data, data_ptr, size);
+	}
 	*((uint32_t*)&Output_Packet->data[size]) = crc32_compute(Output_Packet, Output_Packet->length + 4);
 }
 
@@ -68,9 +118,8 @@ void LMP_Device::Send_Data()
 	}
 }
 
-void LMP_Device::Set_Algorithm(uint8_t algorithm_register_value)
+void LMP_Device::SetAlgorithm(uint8_t algorithm_register_value)
 {
-	PacketBase Output_Packet;
 	Settings GKV_Settings;
 	memset(&GKV_Settings, 0, sizeof(GKV_Settings));
 	uint8_t type = GKV_DEV_SETTINGS_PACKET;
@@ -84,7 +133,51 @@ void LMP_Device::Set_Algorithm(uint8_t algorithm_register_value)
 	Send_Data();
 }
 
+void LMP_Device::SetBaudrate(uint8_t baudrate_register_value)
+{
+	Settings GKV_Settings;
+	memset(&GKV_Settings, 0, sizeof(GKV_Settings));
+	uint8_t type = GKV_DEV_SETTINGS_PACKET;
 
+	if (baudrate_register_value <= BAUDRATE_9600)
+	{
+		GKV_Settings.param_mask |= CHANGE_BAUDRATE;
+		GKV_Settings.uart_baud_rate = baudrate_register_value;
+	}
+	Configure_Output_Packet(type, &GKV_Settings, sizeof(GKV_Settings));
+	Send_Data();
+}
+
+void LMP_Device::SendEmptyPacket(uint8_t type)
+{
+	Configure_Output_Packet(type, 0, 0);
+	Send_Data();
+}
+
+void LMP_Device::RequestSettings()
+{
+	SendEmptyPacket(GKV_DEV_SETTINGS_REQUEST);
+}
+
+void LMP_Device::RequestDeviceID()
+{
+	SendEmptyPacket(GKV_DEV_ID_REQUEST);
+}
+
+void LMP_Device::RequestData()
+{
+	SendEmptyPacket(GKV_DATA_REQUEST);
+}
+
+void LMP_Device::CheckConnection()
+{
+	SendEmptyPacket(GKV_CHECK_PACKET);
+}
+
+void LMP_Device::RequestCustomPacketParams()
+{
+	SendEmptyPacket(GKV_CUSTOM_PACKET_PARAM_REQUEST);
+}
 
 
 /**
@@ -221,10 +314,8 @@ uint8_t LMP_Device::parseCycle()
 			{
 				ptrPacketProcessingFun(((PacketBase*)&InputPacket));
 			}
-			else
-			{
-				RecognisePacket(((PacketBase*)&InputPacket));
-			}
+			RecognisePacket(((PacketBase*)&InputPacket));
+
 			if (!refind_preamble(((PacketBase*)&InputPacket)->length + 8))
 				break;
 		}
@@ -300,54 +391,129 @@ uint8_t LMP_Device::GetInputPacketType()
 
 void LMP_Device::RecognisePacket(PacketBase* buf)
 {
-
     switch (buf->type)
     {
     case GKV_ADC_CODES_PACKET:
     {
-        ADCData* packet;
-        packet = (ADCData*)&buf->data;
-
+		ADCData data;
+		memcpy(&(data), &(buf->data), sizeof(data));
+		if (ptrADCPacketCallback)
+		{
+			ptrADCPacketCallback(&data);
+		}
         break;
     }
     case GKV_RAW_DATA_PACKET:
     {
-        RawData* packet;
-        packet = (RawData*)&buf->data;
-        break;
+		RawData data;
+		memcpy(&(data), &(buf->data), sizeof(data));
+		if (ptrRawDataPacketCallback)
+		{
+			ptrRawDataPacketCallback(&data);
+		}
     }
     case GKV_EULER_ANGLES_PACKET:
     {
-        GyrovertData* packet;
-        packet = (GyrovertData*)&buf->data;
-
+		GyrovertData data;
+		memcpy(&(data), &(buf->data), sizeof(data));
+		if (ptrGyrovertDataPacketCallback)
+		{
+			ptrGyrovertDataPacketCallback(&data);
+		}
         break;
     }
     case GKV_INCLINOMETER_PACKET:
     {
-        InclinometerData* packet;
-        packet = (InclinometerData*)&buf->data;
+		InclinometerData data;
+		memcpy(&(data), &(buf->data), sizeof(data));
+		if (ptrInclinometerDataPacketCallback)
+		{
+			ptrInclinometerDataPacketCallback(&data);
+		}
         break;
     }
     case GKV_BINS_PACKET:
     {
-        BINSData* packet;
-        packet = (BINSData*)&buf->data;
+		BINSData data;
+		memcpy(&(data), &(buf->data), sizeof(data));
+		if (ptrBINSDataPacketCallback)
+		{
+			ptrBINSDataPacketCallback(&data);
+		}
         break;
     }
+	case GKV_BINS2_PACKET:
+	{
+		BINS2Data data;
+		memcpy(&(data), &(buf->data), sizeof(data));
+		if (ptrBINS2DataPacketCallback)
+		{
+			ptrBINS2DataPacketCallback(&data);
+		}
+		break;
+	}
     case GKV_GNSS_PACKET:
     {
-        GpsData* packet;
-        packet = (GpsData*)&buf->data;
-        break;
+		GpsData data;
+		memcpy(&(data), &(buf->data), sizeof(data));
+
+		if (ptrGNSSDataPacketCallback)
+		{
+			ptrGNSSDataPacketCallback(&data);
+		}
+		break;
     }
     case GKV_CUSTOM_PACKET:
     {
-        CustomData* packet;
-        packet = (CustomData*)&buf->data;
-        break;
+        CustomData data;
+		memcpy(&(data), &(buf->data),buf->length);
+		if (ptrCustomDataPacketCallback)
+		{
+			ptrCustomDataPacketCallback(&data);
+		}        break;
     }
-
+	case GKV_DEV_ID_PACKET:
+	{
+		memcpy(&(DeviceState.GeneralDeviceParameters), &buf->data, sizeof(Test));
+		DeviceIDRequestedFlag = false;
+		if (ptrDeviceIDCallback)
+		{
+			ptrDeviceIDCallback(&(DeviceState.GeneralDeviceParameters));
+		}
+		break;
+	}
+	case GKV_DEV_SETTINGS_PACKET:
+	{
+		memcpy(&(DeviceState.CurrentSettings), &buf->data, sizeof(Settings));
+		SettingsRequestedFlag = false;
+		if (ptrSettingsPacketCallback)
+		{
+			ptrSettingsPacketCallback(&(DeviceState.CurrentSettings));
+		}
+		break;
+	}
+	case GKV_CUSTOM_DATA_PARAM_PACKET:
+	{
+		memcpy(&(DeviceState.CurrentCustomPacketParameters), &buf->data, sizeof(CustomDataParam));
+		CustomPacketParamRequestedFlag = false;
+		if (ptrCustomPacketParamCallback)
+		{
+			ptrCustomPacketParamCallback(&(DeviceState.CurrentCustomPacketParameters));
+		}
+		break;
+	}
+	case GKV_CONFIRM_PACKET:
+	{
+		if (CustomPacketParamSentFlag)
+		{
+			CustomPacketParamSentFlag = false;
+		}
+		if (SettingsSentFlag)
+		{
+			SettingsSentFlag = false;
+		}
+		break;
+	}
     }
 }
 
@@ -363,4 +529,7 @@ void LMP_Device::RunDevice()
 {
 	std::thread Receiver(&LMP_Device::dataNewThreadReceiveFcn, this);
 	Receiver.detach();
+	//RequestSettings();
+	//RequestDeviceID();
+	//RequestCustomPacketParams();
 }

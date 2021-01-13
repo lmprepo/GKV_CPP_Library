@@ -1,7 +1,6 @@
 ﻿
 #include <windows.h>
 #include <iostream>
-#include <thread>
 #include <stdio.h>
 #include "LMP_Device.h"
 using namespace std;
@@ -9,6 +8,7 @@ using namespace std;
 HANDLE hSerial;
 
 char ReadCOM();
+void WriteCOM(PacketBase* buf);
 void RecognisePacket(PacketBase* buf);
 void dataNewThreadReceiveFcn();
 
@@ -21,14 +21,13 @@ int main()
     cout << "Set Serial Port:";
     cin >> com_port;
     cout << "#start connecting to " << com_port << "\n";
-
     uint8_t Packet_is_Correct = 0;
     uint8_t algorithm = ADC_CODES_ALGORITHM;
     uint8_t algorithm_packet = GKV_ADC_CODES_PACKET;
     uint8_t algorithm_selected = 0;
-    
     GKV->SetReceivedPacketCallback(RecognisePacket);
     GKV->SetReceiveDataFunction(ReadCOM);
+    GKV->SetSendDataFunction(WriteCOM);
 
 
     std::string sPortName = "\\\\.\\" + std::string(com_port);
@@ -57,16 +56,23 @@ int main()
     dcbSerialParams.StopBits = ONESTOPBIT;
     dcbSerialParams.Parity = NOPARITY;
     GKV->RunDevice();
-   // std::thread Receiver(dataNewThreadReceiveFcn);
-    cout << "#start read loop\n";
+    cout << "#start main loop\n";
     while (1)
     {
-        Sleep(50);
+        Sleep(100);
         cout << "#do something\n";
     }
     return 0;
 }
 
+
+
+void WriteCOM(PacketBase* buf)
+{
+    DWORD dwBytesWritten;
+    char iRet = WriteFile(hSerial, buf, buf->length + 8, &dwBytesWritten, NULL);
+    Sleep(1);
+}
 
 char ReadCOM()
 {

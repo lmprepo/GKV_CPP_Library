@@ -20,7 +20,6 @@ int main()
     cout << "#start connecting to " << com_port << "\n";
 
     uint8_t Packet_is_Correct = 0;
-    uint8_t algorithm = ADC_CODES_ALGORITHM;
     uint8_t algorithm_packet = GKV_ADC_CODES_PACKET;
     uint8_t algorithm_selected = 0;
 
@@ -53,20 +52,20 @@ int main()
     dcbSerialParams.ByteSize = 8;
     dcbSerialParams.StopBits = ONESTOPBIT;
     dcbSerialParams.Parity = NOPARITY;
-    const int MAX_INCORRECT_CNT = 1000;
-    int incorrectCnt = 0;
     GKV->RunDevice();
     while (!(algorithm_selected))
     {
-        GKV->Set_Algorithm(algorithm);
+        GKV->SetAlgorithm(ADC_CODES_ALGORITHM);
         if (GKV->GetInputPacketType() == algorithm_packet)
         {
             algorithm_selected = 1;
         }
     }
-    cout << "#start read loop\n";
+    cout << "#start main loop\n";
     while (1)
     {
+        cout << "#do something\n";
+        Sleep(100);
     }
     return 0;
 }
@@ -76,6 +75,7 @@ void WriteCOM(PacketBase* buf)
 {
     DWORD dwBytesWritten;
     char iRet = WriteFile(hSerial, buf, buf->length + 8, &dwBytesWritten, NULL);
+    Sleep(1);
 }
 
 char ReadCOM()

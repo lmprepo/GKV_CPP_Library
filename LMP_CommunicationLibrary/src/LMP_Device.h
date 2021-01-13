@@ -63,20 +63,38 @@ class LMP_Device
         uint8_t parseCycle();
         uint8_t parse();
         uint8_t refind_preamble(int start);
-        void Set_Algorithm(uint8_t algorithm_register_value);
+        void SetAlgorithm(uint8_t algorithm_register_value);
+        void SetBaudrate(uint8_t baudrate_register_value);
+
+
+        void CheckConnection();
+        void RequestDeviceID();
+        void RequestSettings();
+        void RequestData();
+        void RequestCustomPacketParams();
+
         uint8_t GetInputPacketType();
         void SetSendDataFunction(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr));
         void SetReceivedPacketCallback(void(*ptrReceivedPacketProcessingFun)(PacketBase* Input_Packet_Ptr));
         void SetSettingsReceivedCallback(void(*ptrReceivedPacketProcessingFun)(Settings* settings));
+        void SetCustomPacketParamReceivedCallback(void(*ptrReceivedPacketProcessingFun)(CustomDataParam* param));
+        void SetCustomPacketReceivedCallback(void(*ptrReceivedPacketProcessingFun)(CustomData* data));
+        void SetADCDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(ADCData* data));
+        void SetRawDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(RawData* data));
+        void SetGyrovertDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GyrovertData* data));
+        void SetInclinometerDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(InclinometerData* data));
+        void SetBINSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(BINSData* data));
+        void SetBINS2DataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(BINS2Data* data));
+        void SetGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GpsData* data));
+        void SetExtGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GpsDataExt* data));
 
         void SetReceiveDataFunction(char(*ptrRecPacketFun)());
         void clear() { CTR = 0;}
 
-        //LMP_Device() : writer{ &LMP_Device::dataNewThreadReceiveFcn, this };
-
 	private:
 
         void dataNewThreadReceiveFcn();
+        void SendEmptyPacket(uint8_t type);
         void RecognisePacket(PacketBase* buf);
 
         std::thread Receiver;
@@ -86,7 +104,34 @@ class LMP_Device
         uint32_t CTR = 0;
         void(*ptrSendFun)(PacketBase* Output_Packet_Ptr) = NULL;
         void(*ptrPacketProcessingFun)(PacketBase* Input_Packet_Ptr) = NULL;
-        void(*ptrSettingsPacketProcessingFun)(Settings* settings) = NULL;
+        void(*ptrSettingsPacketCallback)(Settings* settings) = NULL;
+        void(*ptrCustomPacketParamCallback)(CustomDataParam* param) = NULL;
+        void(*ptrDeviceIDCallback)(Test* data) = NULL;
+        void(*ptrADCPacketCallback)(ADCData* data) = NULL;
+        void(*ptrRawDataPacketCallback)(RawData* data) = NULL;
+        void(*ptrGyrovertDataPacketCallback)(GyrovertData* data) = NULL;
+        void(*ptrInclinometerDataPacketCallback)(InclinometerData* data) = NULL;
+        void(*ptrBINSDataPacketCallback)(BINSData* data) = NULL;
+        void(*ptrBINS2DataPacketCallback)(BINS2Data* data) = NULL;
+        void(*ptrGNSSDataPacketCallback)(GpsData* data) = NULL;
+        void(*ptrExtGNSSDataPacketCallback)(GpsDataExt* data) = NULL;
+        void(*ptrCustomDataPacketCallback)(CustomData* data) = NULL;
+
+
+        bool CheckConnectionRequestedFlag = false;
+        bool DeviceIDRequestedFlag = false;
+        bool SettingsSentFlag = false;
+        bool SettingsRequestedFlag = false;
+        bool CustomPacketParamSentFlag = false;
+        bool CustomPacketParamRequestedFlag = false;
+        bool DataRequestedFlag = false;
+
+        struct __DeviceState
+        {
+            Test GeneralDeviceParameters;
+            Settings CurrentSettings;
+            CustomDataParam CurrentCustomPacketParameters;
+        }DeviceState;
 
         char (*ptrRecFcn)(void) = NULL;
         enum EStatus
