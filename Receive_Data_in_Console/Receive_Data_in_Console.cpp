@@ -55,12 +55,19 @@ int main()
     dcbSerialParams.ByteSize = 8;
     dcbSerialParams.StopBits = ONESTOPBIT;
     dcbSerialParams.Parity = NOPARITY;
+    if (!SetCommState(hSerial, &dcbSerialParams))
+    {
+        cout << "error setting serial port state\n";
+        return 1;
+    }
     GKV->RunDevice();
     cout << "#start main loop\n";
     while (1)
     {
-        Sleep(100);
-        cout << "#do something\n";
+        //Sleep(100);
+        //cout << "#do something\n";
+        //    cout << this_thread::get_id() << "Thread\n";
+        //GKV->Receive_Process();
     }
     return 0;
 }
@@ -78,9 +85,13 @@ char ReadCOM()
 {
     DWORD iSize;
     char sReceivedChar;
+    char iRet = 0;
+    //cout << this_thread::get_id() << "Thread\n";
+
     while (true)
     {
-        ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
+
+        iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
         if (iSize > 0)
             return sReceivedChar;
     }

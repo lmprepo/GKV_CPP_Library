@@ -8,7 +8,7 @@ LMP_Device::LMP_Device()
 
 LMP_Device::~LMP_Device()
 {
-
+	gkv_open = false;
 }
 
 
@@ -361,7 +361,6 @@ uint8_t LMP_Device::parseCycle()
 				ptrPacketProcessingFun(((PacketBase*)&InputPacket));
 			}
 			RecognisePacket(((PacketBase*)&InputPacket));
-
 			if (!refind_preamble(((PacketBase*)&InputPacket)->length + 8))
 				break;
 		}
@@ -565,7 +564,7 @@ void LMP_Device::RecognisePacket(PacketBase* buf)
 
 void LMP_Device::dataNewThreadReceiveFcn()
 {
-	while (1)
+	while (gkv_open)
 	{
 		Receive_Process();
 	}
@@ -573,9 +572,10 @@ void LMP_Device::dataNewThreadReceiveFcn()
 
 void LMP_Device::RunDevice()
 {
+	Receive_Process();
 	std::thread Receiver(&LMP_Device::dataNewThreadReceiveFcn, this);
 	Receiver.detach();
-	//RequestSettings();
-	//RequestDeviceID();
-	//RequestCustomPacketParams();
+	RequestSettings();
+	RequestDeviceID();
+	RequestCustomPacketParams();
 }

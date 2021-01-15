@@ -59,7 +59,11 @@ class LMP_Device
         uint32_t crc32_compute(const void* buf, unsigned long size);
 
         uint8_t Receive_Process();
-
+        uint8_t parseCycle();
+        uint8_t parse();
+        uint8_t refind_preamble(int start);
+        uint8_t check(PacketBase* pack);
+        uint8_t put(uint8_t b);
         void SetAlgorithm(uint8_t algorithm_register_value);
         void SetBaudrate(uint8_t baudrate_register_value);
         void SetDefaultAlgorithmPacket();
@@ -96,11 +100,7 @@ class LMP_Device
         void dataNewThreadReceiveFcn();
         void SendEmptyPacket(uint8_t type);
         void RecognisePacket(PacketBase* buf);
-        uint8_t parseCycle();
-        uint8_t parse();
-        uint8_t refind_preamble(int start);
-        uint8_t check(PacketBase* pack);
-        uint8_t put(uint8_t b);
+
 
         std::thread Receiver;
 
@@ -130,6 +130,7 @@ class LMP_Device
         bool CustomPacketParamSentFlag = false;
         bool CustomPacketParamRequestedFlag = false;
         bool DataRequestedFlag = false;
+        bool gkv_open=true;
 
         struct __DeviceState
         {
