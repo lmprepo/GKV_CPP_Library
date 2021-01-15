@@ -52,6 +52,11 @@ int main()
     dcbSerialParams.ByteSize = 8;
     dcbSerialParams.StopBits = ONESTOPBIT;
     dcbSerialParams.Parity = NOPARITY;
+    if (!SetCommState(hSerial, &dcbSerialParams))
+    {
+        cout << "error setting serial port state\n";
+        return 1;
+    }
     GKV->RunDevice();
     while (!(algorithm_selected))
     {

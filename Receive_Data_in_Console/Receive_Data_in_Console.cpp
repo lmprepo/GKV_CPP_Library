@@ -64,10 +64,8 @@ int main()
     cout << "#start main loop\n";
     while (1)
     {
-        //Sleep(100);
-        //cout << "#do something\n";
-        //    cout << this_thread::get_id() << "Thread\n";
-        //GKV->Receive_Process();
+        Sleep(100);
+        cout << "#do something\n";
     }
     return 0;
 }
@@ -86,8 +84,6 @@ char ReadCOM()
     DWORD iSize;
     char sReceivedChar;
     char iRet = 0;
-    //cout << this_thread::get_id() << "Thread\n";
-
     while (true)
     {
 
