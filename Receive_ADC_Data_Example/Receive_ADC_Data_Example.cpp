@@ -9,7 +9,7 @@ HANDLE hSerial;
 
 char ReadCOM();
 void WriteCOM(PacketBase* buf);
-void RecognisePacket(PacketBase* buf);
+void ShowPacketData(ADCData* buf);
 
 int main()
 {
@@ -26,7 +26,7 @@ int main()
     LMP_Device *GKV = new LMP_Device();
     GKV->SetSendDataFunction(WriteCOM);
     GKV->SetReceiveDataFunction(ReadCOM);
-    GKV->SetReceivedPacketCallback(RecognisePacket);
+    GKV->SetADCDataReceivedCallback(ShowPacketData);
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hSerial == INVALID_HANDLE_VALUE)
@@ -90,16 +90,9 @@ char ReadCOM()
     }
 }
 
-void RecognisePacket(PacketBase* buf)
+void ShowPacketData(ADCData* packet)
 {
-    char str[30];
-
-    switch (buf->type)
-    {
-    case GKV_ADC_CODES_PACKET:
-    {
-        ADCData* packet;
-        packet = (ADCData*)&buf->data;
+        char str[30];
         sprintf(str, "%d", packet->sample_cnt);
         cout << "Sample Counter = " << str << ' ';
         sprintf_s(str, "%d", packet->a[0]);
@@ -114,50 +107,4 @@ void RecognisePacket(PacketBase* buf)
         cout << "wy = " << str << ' ';
         sprintf_s(str, "%d", packet->w[2]);
         cout << "wz = " << str << endl;
-        break;
-    }
-    case GKV_RAW_DATA_PACKET:
-    {
-        RawData* packet;
-        packet = (RawData*)&buf->data;
-        sprintf_s(str, "%d", packet->sample_cnt);
-        cout << "Sample Counter = " << str << ' ';
-        sprintf_s(str, "%f", packet->a[0]);
-        cout << "ax = " << str << ' ';
-        sprintf_s(str, "%f", packet->a[1]);
-        cout << "ay = " << str << ' ';
-        sprintf_s(str, "%f", packet->a[2]);
-        cout << "az = " << str << ' ';
-        sprintf_s(str, "%f", packet->w[0]);
-        cout << "wx = " << str << ' ';
-        sprintf_s(str, "%f", packet->w[1]);
-        cout << "wy = " << str << ' ';
-        sprintf_s(str, "%f", packet->w[2]);
-        cout << "wz = " << str << endl;
-        break;
-    }
-    case GKV_CUSTOM_PACKET:
-    {
-        CustomData* packet;
-        packet = (CustomData*)&buf->data;
-        cout << "CustomPacket: ";
-        for (uint8_t i = 0; i < ((buf->length) / 4); i++)
-        {
-            if (packet->parameter[i] == packet->parameter[i])// проверка на isnan
-            {
-                sprintf_s(str, "%f", (packet->parameter[i]));
-                cout << "param = " << str << ' ';
-            }
-            else
-            {
-                cout << "param = NaN ";
-            }
-
-        }
-        cout << endl;
-        break;
-    }
-    // Примечание: в данном примере вывод значений некоторых параметров наборного пакета с пометкой int будет некорректен, поскольку данная программа  
-    // не посылает запроса на получение номеров парамеров наборного пакета и выводит все параметры, как float.
-    }
 }

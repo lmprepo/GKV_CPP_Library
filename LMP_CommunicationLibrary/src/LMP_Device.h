@@ -57,14 +57,14 @@ class LMP_Device
         void Send_Data();
         void Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t size);
         uint32_t crc32_compute(const void* buf, unsigned long size);
-        uint8_t check(PacketBase* pack);
-        uint8_t put(uint8_t b);
+
         uint8_t Receive_Process();
-        uint8_t parseCycle();
-        uint8_t parse();
-        uint8_t refind_preamble(int start);
+
         void SetAlgorithm(uint8_t algorithm_register_value);
         void SetBaudrate(uint8_t baudrate_register_value);
+        void SetDefaultAlgorithmPacket();
+        void SetCustomAlgorithmPacket();
+        void SetCustomPacketParam(uint8_t* param_array_ptr, uint8_t quantity_of_params);
 
 
         void CheckConnection();
@@ -96,6 +96,11 @@ class LMP_Device
         void dataNewThreadReceiveFcn();
         void SendEmptyPacket(uint8_t type);
         void RecognisePacket(PacketBase* buf);
+        uint8_t parseCycle();
+        uint8_t parse();
+        uint8_t refind_preamble(int start);
+        uint8_t check(PacketBase* pack);
+        uint8_t put(uint8_t b);
 
         std::thread Receiver;
 

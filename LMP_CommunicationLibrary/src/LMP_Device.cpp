@@ -17,6 +17,11 @@ void  LMP_Device::SetSendDataFunction(void(*ptrSendPacketFun)(PacketBase* Output
 	ptrSendFun = ptrSendPacketFun;
 }
 
+void  LMP_Device::SetReceiveDataFunction(char(*ptrRecPacketFun)())
+{
+	ptrRecFcn = ptrRecPacketFun;
+}
+
 void  LMP_Device::SetReceivedPacketCallback(void(*ptrReceivedPacketProcessingFun)(PacketBase* Input_Packet_Ptr))
 {
 	ptrPacketProcessingFun = ptrReceivedPacketProcessingFun;
@@ -25,11 +30,6 @@ void  LMP_Device::SetReceivedPacketCallback(void(*ptrReceivedPacketProcessingFun
 void LMP_Device::SetSettingsReceivedCallback(void(*ptrReceivedPacketProcessingFun)(Settings* settings))
 {
 	ptrSettingsPacketCallback = ptrReceivedPacketProcessingFun;
-}
-
-void  LMP_Device::SetReceiveDataFunction(char(*ptrRecPacketFun)())
-{
-	ptrRecFcn = ptrRecPacketFun;
 }
 
 void LMP_Device::SetCustomPacketParamReceivedCallback(void(*ptrReceivedPacketProcessingFun)(CustomDataParam* param))
@@ -42,9 +42,9 @@ void LMP_Device::SetCustomPacketReceivedCallback(void(*ptrReceivedPacketProcessi
 	ptrCustomDataPacketCallback = ptrReceivedPacketProcessingFun;
 }
 
-void LMP_Device::SetADCDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(ADCData* data))
+void LMP_Device::SetADCDataReceivedCallback(void(*ptrADCPacketRecCallback)(ADCData* data))
 {
-	ptrADCPacketCallback = ptrReceivedPacketProcessingFun;
+	ptrADCPacketCallback = ptrADCPacketRecCallback;
 }
 
 void LMP_Device::SetRawDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(RawData* data))
@@ -118,6 +118,12 @@ void LMP_Device::Send_Data()
 	}
 }
 
+void LMP_Device::SendEmptyPacket(uint8_t type)
+{
+	Configure_Output_Packet(type, 0, 0);
+	Send_Data();
+}
+
 void LMP_Device::SetAlgorithm(uint8_t algorithm_register_value)
 {
 	Settings GKV_Settings;
@@ -148,9 +154,49 @@ void LMP_Device::SetBaudrate(uint8_t baudrate_register_value)
 	Send_Data();
 }
 
-void LMP_Device::SendEmptyPacket(uint8_t type)
+/**
+  * @name	SetDefaultAlgorithmPacket
+  * @brief  Function configures base packet of 0x06 type and sends it to GKV to set sending mode as default packet for current algorithm. Sending via callback function SendPacketFun
+  * @retval no return value.
+  */
+void LMP_Device::SetDefaultAlgorithmPacket()
 {
-	Configure_Output_Packet(type, 0, 0);
+	Settings GKV_Settings;
+	memset(&GKV_Settings, 0, sizeof(GKV_Settings));
+	uint8_t type = GKV_DEV_SETTINGS_PACKET;
+
+	GKV_Settings.mode = SET_DEFAULT_ALGORITHM_PACKET;
+	GKV_Settings.mode_mask = ALLOW_CHANGE_SELECTED_PACKET;
+	Configure_Output_Packet(type, &GKV_Settings, sizeof(GKV_Settings));
+	Send_Data();
+}
+
+/**
+  * @name	SetCustomAlgorithmPacket
+  * @brief  Function configures base packet of 0x06 type and sends it to GKV to set sending mode as custom packet for current algorithm. Sending via callback function SendPacketFun
+  * @retval no return value.
+  */
+void LMP_Device::SetCustomAlgorithmPacket()
+{
+	Settings GKV_Settings;
+	memset(&GKV_Settings, 0, sizeof(GKV_Settings));
+	uint8_t type = GKV_DEV_SETTINGS_PACKET;
+	GKV_Settings.mode = SET_CUSTOM_PACKET;
+	GKV_Settings.mode_mask = ALLOW_CHANGE_SELECTED_PACKET;
+	Configure_Output_Packet(type, &GKV_Settings, sizeof(GKV_Settings));
+	Send_Data();
+}
+
+
+
+void LMP_Device::SetCustomPacketParam(uint8_t *param_array_ptr,uint8_t quantity_of_params)
+{
+	CustomDataParam GKV_CustomDataParam;
+	memset(&GKV_CustomDataParam, 0, sizeof(GKV_CustomDataParam));
+	uint8_t type = GKV_CUSTOM_DATA_PARAM_PACKET;
+	GKV_CustomDataParam.num = quantity_of_params;
+	memcpy(&(GKV_CustomDataParam.param), &param_array_ptr, quantity_of_params);
+	Configure_Output_Packet(type, &GKV_CustomDataParam, sizeof(GKV_CustomDataParam));
 	Send_Data();
 }
 
