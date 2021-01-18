@@ -106,6 +106,7 @@ class LMP_Device
 
         uint8_t InputPacket[sizeof(PacketBase)] = { 0 };
         PacketBase* Output_Packet = new PacketBase;
+        PacketBase* CurrentReceivedPacket = new PacketBase;
         uint32_t CTR = 0;
         void(*ptrSendFun)(PacketBase* Output_Packet_Ptr) = NULL;
         void(*ptrPacketProcessingFun)(PacketBase* Input_Packet_Ptr) = NULL;

@@ -8,6 +8,7 @@
   */
 LMP_Device::LMP_Device()
 {
+	memset(CurrentReceivedPacket, 0, sizeof(PacketBase));
 }
 
 /**
@@ -477,11 +478,12 @@ uint8_t LMP_Device::parseCycle()
 		}
 		else if (status == CHECK_OK)
 		{
+			memcpy(CurrentReceivedPacket, &InputPacket, (((PacketBase*)&InputPacket)->length + 8));
 			if(ptrPacketProcessingFun)
 			{
-				ptrPacketProcessingFun(((PacketBase*)&InputPacket));
+				ptrPacketProcessingFun(CurrentReceivedPacket);
 			}
-			RecognisePacket(((PacketBase*)&InputPacket));
+			RecognisePacket(CurrentReceivedPacket);
 			if (!refind_preamble(((PacketBase*)&InputPacket)->length + 8))
 				break;
 		}
@@ -551,7 +553,7 @@ uint8_t LMP_Device::parse()
   */
 uint8_t LMP_Device::GetInputPacketType()
 {
-	return (((PacketBase*)&InputPacket)->type);
+	return (CurrentReceivedPacket->type);
 }
 
 /**

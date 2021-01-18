@@ -70,7 +70,6 @@ int main()
     return 0;
 }
 
-
 void WriteCOM(PacketBase* buf)
 {
     DWORD dwBytesWritten;
