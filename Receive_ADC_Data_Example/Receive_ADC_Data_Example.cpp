@@ -6,6 +6,7 @@
 using namespace std;
 
 HANDLE hSerial;
+uint8_t algorithm_selected = 0;
 
 char ReadCOM();
 void WriteCOM(PacketBase* buf);
@@ -13,17 +14,15 @@ void ShowPacketData(ADCData* buf);
 
 int main()
 {
-
     string com_port;
     cout << "Set Serial Port:";
     cin >> com_port;
     cout << "#start connecting to " << com_port << "\n";
-
     uint8_t Packet_is_Correct = 0;
     uint8_t algorithm_packet = GKV_ADC_CODES_PACKET;
-    uint8_t algorithm_selected = 0;
+    //Create LMP Device Object GKV
     LMP_Device *GKV = new LMP_Device();
-
+    //Serial Port Settings For Windows
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hSerial == INVALID_HANDLE_VALUE)
@@ -54,24 +53,19 @@ int main()
         cout << "error setting serial port state\n";
         return 1;
     }
-    GKV->SetSendDataFunction(WriteCOM);
-    GKV->SetReceiveDataFunction(ReadCOM);
-    GKV->SetADCDataReceivedCallback(ShowPacketData);
-
-    GKV->RunDevice();
+    // GKV Settings
+    GKV->SetSendDataFunction(WriteCOM);//Set User Function That Sends Data to Serial Port connected to GKV
+    GKV->SetReceiveDataFunction(ReadCOM);//Set User Function That Receives Data From Serial Port And Returns Received Byte
+    GKV->SetADCDataReceivedCallback(ShowPacketData);//Set User Callback for Parsed ADC GKV Packet
+    GKV->RunDevice();//Run Thread For Receiving Data From GKV
     while (!(algorithm_selected))
     {
         GKV->SetAlgorithm(ADC_CODES_ALGORITHM);
-        if (GKV->GetInputPacketType() == algorithm_packet)
-        {
-            algorithm_selected = 1;
-        }
     }
     cout << "#start main loop\n";
     while (1)
     {
-        cout << "#do something\n";
-        Sleep(100);
+        //do something
     }
     return 0;
 }
@@ -113,4 +107,5 @@ void ShowPacketData(ADCData* packet)
         cout << "wy = " << str << ' ';
         sprintf_s(str, "%d", packet->w[2]);
         cout << "wz = " << str << endl;
+        algorithm_selected = 1;
 }

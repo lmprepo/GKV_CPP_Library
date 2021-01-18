@@ -58,8 +58,7 @@ int main()
     cout << "#start main loop\n";
     while (1)
     {
-        Sleep(100);
-        cout << "#do something\n";
+        //do something
     }
     return 0;
 }
