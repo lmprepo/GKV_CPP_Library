@@ -22,11 +22,8 @@ int main()
     uint8_t Packet_is_Correct = 0;
     uint8_t algorithm_packet = GKV_ADC_CODES_PACKET;
     uint8_t algorithm_selected = 0;
-
     LMP_Device *GKV = new LMP_Device();
-    GKV->SetSendDataFunction(WriteCOM);
-    GKV->SetReceiveDataFunction(ReadCOM);
-    GKV->SetADCDataReceivedCallback(ShowPacketData);
+
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hSerial == INVALID_HANDLE_VALUE)
@@ -57,6 +54,10 @@ int main()
         cout << "error setting serial port state\n";
         return 1;
     }
+    GKV->SetSendDataFunction(WriteCOM);
+    GKV->SetReceiveDataFunction(ReadCOM);
+    GKV->SetADCDataReceivedCallback(ShowPacketData);
+
     GKV->RunDevice();
     while (!(algorithm_selected))
     {

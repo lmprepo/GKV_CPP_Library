@@ -10,10 +10,6 @@ HANDLE hSerial;
 char ReadCOM();
 void WriteCOM(PacketBase* buf);
 void RecognisePacket(PacketBase* buf);
-void dataNewThreadReceiveFcn();
-
-LMP_Device* GKV = new LMP_Device();
-
 
 int main()
 {
@@ -21,15 +17,9 @@ int main()
     cout << "Set Serial Port:";
     cin >> com_port;
     cout << "#start connecting to " << com_port << "\n";
-    uint8_t Packet_is_Correct = 0;
-    uint8_t algorithm = ADC_CODES_ALGORITHM;
-    uint8_t algorithm_packet = GKV_ADC_CODES_PACKET;
-    uint8_t algorithm_selected = 0;
-    GKV->SetReceivedPacketCallback(RecognisePacket);
-    GKV->SetReceiveDataFunction(ReadCOM);
-    GKV->SetSendDataFunction(WriteCOM);
-
-
+    //Create LMP Device Object GKV
+    LMP_Device* GKV = new LMP_Device();
+    //Serial Port Settings For Windows
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hSerial == INVALID_HANDLE_VALUE)
@@ -60,7 +50,11 @@ int main()
         cout << "error setting serial port state\n";
         return 1;
     }
-    GKV->RunDevice();
+    // GKV Settings
+    GKV->SetReceivedPacketCallback(RecognisePacket);//Set User Callback for Each Parsed GKV Packet
+    GKV->SetReceiveDataFunction(ReadCOM);//Set User Function That Receives Data From Serial Port And Returns Received Byte
+    GKV->SetSendDataFunction(WriteCOM);//Set User Function That Sends Data to Serial Port connected to GKV
+    GKV->RunDevice();//Run Thread For Receiving Data From GKV
     cout << "#start main loop\n";
     while (1)
     {
@@ -86,7 +80,6 @@ char ReadCOM()
     char iRet = 0;
     while (true)
     {
-
         iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
         if (iSize > 0)
             return sReceivedChar;
