@@ -7,7 +7,7 @@ using namespace std;
 HANDLE hSerial;
 string input;
 uint8_t algorithm = ADC_CODES_ALGORITHM;
-uint8_t algorithm_packet = GKV_ADC_CODES_PACKET;
+uint8_t algorithm_packet = 0;
 uint8_t algorithm_selected = 0;
 
 char ReadCOM();
@@ -55,11 +55,12 @@ int main()
         cout << "error setting serial port state\n";
         return 1;
     }
+    cout << "#set state ok\n";
     // GKV Settings
     GKV->SetReceivedPacketCallback(RecognisePacket);//Set User Callback for Each Parsed GKV Packet
     GKV->SetReceiveDataFunction(ReadCOM);//Set User Function That Receives Data From Serial Port And Returns Received Byte
     GKV->SetSendDataFunction(WriteCOM);//Set User Function That Sends Data to Serial Port connected to GKV
-    GKV->RunDevice();//Run Thread For Receiving Data From GKV    /* Receive Data for Selected algorithm */
+    GKV->RunDevice();//Run Thread For Receiving Data From GKV  
 
     printf("Choose GKV algorithm:\n");
     printf("0 - ADC Codes Data from Sensors\n");

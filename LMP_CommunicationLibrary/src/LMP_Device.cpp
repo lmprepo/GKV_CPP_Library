@@ -710,7 +710,7 @@ void LMP_Device::dataNewThreadReceiveFcn()
   */
 void LMP_Device::RunDevice()
 {
-	Receive_Process();
+	//Receive_Process();
 	std::thread Receiver(&LMP_Device::dataNewThreadReceiveFcn, this);
 	Receiver.detach();
 	RequestSettings();
