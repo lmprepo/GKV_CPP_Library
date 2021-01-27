@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <iostream>
 #include <thread>
+#ifdef __linux
+#include <pthread.h>
+#endif
 #include "LMP_BasePacket.h"
 #include "LMP_TestPacket.h"
 #include "LMP_SettingsPacket.h"

@@ -13,6 +13,7 @@ void RecognisePacket(PacketBase* buf);
 
 int main()
 {
+    //Select Serial Port
     string com_port;
     cout << "Set Serial Port:";
     cin >> com_port;

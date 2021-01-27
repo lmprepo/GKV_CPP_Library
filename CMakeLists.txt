@@ -9,6 +9,8 @@ add_subdirectory (LMP_CommunicationLibrary)
 
 add_subdirectory (Receive_Data_in_Console)
 
+add_subdirectory (Receive_Data_in_Console_linux)
+
 add_subdirectory (Receive_ADC_Data_Example)
 
 add_subdirectory (Choose_Algorithm_Example)

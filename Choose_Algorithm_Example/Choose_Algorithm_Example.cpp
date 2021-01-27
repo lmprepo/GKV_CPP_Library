@@ -18,13 +18,14 @@ uint8_t ChooseAlgorithmPacket(uint8_t algorithm);
 
 int main()
 {
+    /*Select Serial Port*/
     string com_port;
     cout << "Set Serial Port:";
     cin >> com_port;
     cout << "#start connecting to " << com_port << "\n";
-    //Create LMP Device Object GKV
+    /*Create LMP Device Object GKV*/
     LMP_Device* GKV = new LMP_Device();
-    //Serial Port Settings For Windows
+    /*Serial Port Settings For Windows*/
     std::string sPortName = "\\\\.\\" + std::string(com_port);
     hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
     if (hSerial == INVALID_HANDLE_VALUE)
@@ -56,7 +57,7 @@ int main()
         return 1;
     }
     cout << "#set state ok\n";
-    // GKV Settings
+    /* GKV Settings*/
     GKV->SetReceivedPacketCallback(RecognisePacket);//Set User Callback for Each Parsed GKV Packet
     GKV->SetReceiveDataFunction(ReadCOM);//Set User Function That Receives Data From Serial Port And Returns Received Byte
     GKV->SetSendDataFunction(WriteCOM);//Set User Function That Sends Data to Serial Port connected to GKV
