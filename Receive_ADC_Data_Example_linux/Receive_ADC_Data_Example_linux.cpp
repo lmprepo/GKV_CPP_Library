@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "LMP_Device.h"
+using namespace Gyrovert;
 using namespace std;
 
 int SerialPortHandle;
