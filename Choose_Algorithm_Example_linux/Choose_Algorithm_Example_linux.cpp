@@ -1,11 +1,14 @@
-﻿#ifdef _WIN32
-#include <windows.h>
+﻿#ifdef __linux
+#include <stdlib.h>
+#include <unistd.h>     
+#include <fcntl.h>      
+#include <termios.h>    
 #include <iostream>
 #include <stdio.h>
 #include "LMP_Device.h"
 using namespace std;
-HANDLE hSerial;
 
+int SerialPortHandle;
 string input;
 uint8_t algorithm = ADC_CODES_ALGORITHM;
 uint8_t algorithm_packet = 0;
@@ -20,20 +23,20 @@ uint8_t ChooseAlgorithmPacket(uint8_t algorithm);
 
 int main()
 {
-    /*Select Serial Port*/
+    /* Select Serial Port */
     string com_port;
     cout << "Set Serial Port:";
     cin >> com_port;
     cout << "#start connecting to " << com_port << "\n";
-    /*Create LMP Device Object GKV*/
+    /* Create LMP Device Object GKV */
     LMP_Device* GKV = new LMP_Device();
-    /*Serial Port Settings For Windows */
-    if (!(InitSerialPort(com_port, 921600))) return 1;
-    /* GKV Settings*/
+    /* Serial Port Settings For Linux */
+    if (!(InitSerialPort(com_port, B921600))) return 1;
+    /* GKV Settings */
     GKV->SetReceivedPacketCallback(RecognisePacket);//Set User Callback for Each Parsed GKV Packet
     GKV->SetReceiveDataFunction(ReadCOM);//Set User Function That Receives Data From Serial Port And Returns Received Byte
     GKV->SetSendDataFunction(WriteCOM);//Set User Function That Sends Data to Serial Port connected to GKV
-    GKV->RunDevice();//Run Thread For Receiving Data From GKV
+    GKV->RunDevice();//Run Thread For Receiving Data From GKV  
 
     printf("Choose GKV algorithm:\n");
     printf("0 - ADC Codes Data from Sensors\n");
@@ -57,17 +60,16 @@ int main()
         }
         else
         {
-            cout << "Wrong value. Try Again. Selected Algorithm = ";
+            printf("Wrong value. Try Again. Selected Algorithm = ");
             algorithm = 255;
         }
     } while (!(check_input(input)));
     algorithm_packet = ChooseAlgorithmPacket(algorithm);
-    /* Set Selected Algorithm */
+
     while (!(algorithm_selected))
     {
         GKV->SetAlgorithm(algorithm);
     }
-    cout << "#start main loop\n";
     while (1)
     {
         //do something
@@ -77,33 +79,40 @@ int main()
 
 bool InitSerialPort(string port_name, int32_t baudrate)
 {
-    hSerial = ::CreateFileA(port_name.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-    if (hSerial == INVALID_HANDLE_VALUE)
-    {
-        if (GetLastError() == ERROR_FILE_NOT_FOUND)
-        {
-            cout << "serial port does not exist.\n";
-            return 0;
-        }
-        cout << "some other error occurred.\n";
+    SerialPortHandle = open(port_name.c_str(), O_RDWR | O_NOCTTY);
+    if (SerialPortHandle < 0) {
+        printf("Error opening port\n");
         return 0;
     }
-    cout << "#connect ok\n";
-    DCB dcbSerialParams = { 0 };
-    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    if (!GetCommState(hSerial, &dcbSerialParams))
-    {
-        cout << "getting state error\n";
+    struct termios tty;
+    struct termios tty_old;
+    memset(&tty, 0, sizeof tty);
+    /* Error Handling */
+    if (tcgetattr(SerialPortHandle, &tty) != 0) {
+        std::cout << "Error " << errno << " from tcgetattr: " << strerror(errno) << std::endl;
         return 0;
     }
-    cout << "#get state ok\n";
-    dcbSerialParams.BaudRate = baudrate;
-    dcbSerialParams.ByteSize = 8;
-    dcbSerialParams.StopBits = ONESTOPBIT;
-    dcbSerialParams.Parity = NOPARITY;
-    if (!SetCommState(hSerial, &dcbSerialParams))
-    {
-        cout << "error setting serial port state\n";
+    /* Save old tty parameters */
+    tty_old = tty;
+    /* Set Baud Rate */
+    cfsetospeed(&tty, (speed_t)baudrate);
+    cfsetispeed(&tty, (speed_t)baudrate);
+    /* Setting other Port Stuff */
+    tty.c_cflag &= ~PARENB;            // Make 8n1
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag &= ~CSIZE;
+    tty.c_cflag |= CS8;
+
+    tty.c_cflag &= ~CRTSCTS;           // no flow control
+    tty.c_cc[VMIN] = 1;                  // read doesn't block
+    tty.c_cc[VTIME] = 5;                  // 0.5 seconds read timeout
+    tty.c_cflag |= CREAD | CLOCAL;     // turn on READ & ignore ctrl lines
+    /* Make raw */
+    cfmakeraw(&tty);
+    /* Flush Port, then applies attributes */
+    tcflush(SerialPortHandle, TCIFLUSH);
+    if (tcsetattr(SerialPortHandle, TCSANOW, &tty) != 0) {
+        std::cout << "Error " << errno << " from tcsetattr" << std::endl;
         return 0;
     }
     return 1;
@@ -111,25 +120,20 @@ bool InitSerialPort(string port_name, int32_t baudrate)
 
 void WriteCOM(PacketBase* buf)
 {
-    DWORD dwBytesWritten;
-    char iRet = WriteFile(hSerial, buf, buf->length + 8, &dwBytesWritten, NULL);
-    Sleep(1);
+    int iOut = write(SerialPortHandle, buf, buf->length + 8);
+    usleep(1000);
 }
 
 char ReadCOM()
 {
-    DWORD iSize;
     char sReceivedChar;
-    char iRet = 0;
     while (true)
     {
-        iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
-        if (iSize > 0)
-            return sReceivedChar;
+        int iOut = read(SerialPortHandle, &sReceivedChar, 1);
+        return sReceivedChar;
     }
     return 0;
 }
-
 
 uint8_t check_input(string str)
 {
@@ -149,7 +153,6 @@ uint8_t check_input(string str)
     }
     return 1;
 }
-
 
 uint8_t ChooseAlgorithmPacket(uint8_t algorithm)
 {
