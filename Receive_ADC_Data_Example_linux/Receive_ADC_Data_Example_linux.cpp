@@ -55,7 +55,7 @@ bool InitSerialPort(string port_name, int32_t baudrate)
     memset(&tty, 0, sizeof tty);
     /* Error Handling */
     if (tcgetattr(SerialPortHandle, &tty) != 0) {
-        std::cout << "Error " << errno << " from tcgetattr: " << strerror(errno) << std::endl;
+        cout << "Error " << errno << " from tcgetattr: " << strerror(errno) << endl;
         return 0;
     }
     /* Save old tty parameters */
@@ -78,7 +78,7 @@ bool InitSerialPort(string port_name, int32_t baudrate)
     /* Flush Port, then applies attributes */
     tcflush(SerialPortHandle, TCIFLUSH);
     if (tcsetattr(SerialPortHandle, TCSANOW, &tty) != 0) {
-        std::cout << "Error " << errno << " from tcsetattr" << std::endl;
+        cout << "Error " << errno << " from tcsetattr" << endl;
         return 0;
     }
     return 1;
