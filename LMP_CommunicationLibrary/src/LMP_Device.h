@@ -2,6 +2,7 @@
 #define LMP_DEVICE_H
 #include <stdint.h>
 #include <iostream>
+#include <string.h>
 #include <thread>
 #ifdef __linux
 #include <pthread.h>

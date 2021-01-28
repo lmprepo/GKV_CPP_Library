@@ -1,5 +1,4 @@
 #include "LMP_Device.h"
-#include <string.h>
 
 /**
   * @name	LMP_Device

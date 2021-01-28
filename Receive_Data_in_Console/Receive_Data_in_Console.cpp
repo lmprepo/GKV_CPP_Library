@@ -1,4 +1,4 @@
-﻿
+﻿#ifdef _WIN32
 #include <windows.h>
 #include <iostream>
 #include <stdio.h>
@@ -7,51 +7,23 @@ using namespace std;
 
 HANDLE hSerial;
 
+bool InitSerialPort(string port_name, int32_t baudrate);
 char ReadCOM();
 void WriteCOM(PacketBase* buf);
 void RecognisePacket(PacketBase* buf);
 
 int main()
 {
-    //Select Serial Port
+    /* Select Serial Port */
     string com_port;
     cout << "Set Serial Port:";
     cin >> com_port;
     cout << "#start connecting to " << com_port << "\n";
-    //Create LMP Device Object GKV
+    /* Create LMP Device Object GKV */
     LMP_Device* GKV = new LMP_Device();
-    //Serial Port Settings For Windows
-    std::string sPortName = "\\\\.\\" + std::string(com_port);
-    hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-    if (hSerial == INVALID_HANDLE_VALUE)
-    {
-        if (GetLastError() == ERROR_FILE_NOT_FOUND)
-        {
-            cout << "serial port does not exist.\n";
-            return 1;
-        }
-        cout << "some other error occurred.\n";
-        return 1;
-    }
-    cout << "#connect ok\n";
-    DCB dcbSerialParams = { 0 };
-    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    if (!GetCommState(hSerial, &dcbSerialParams))
-    {
-        cout << "getting state error\n";
-        return 1;
-    }
-    cout << "#get state ok\n";
-    dcbSerialParams.BaudRate = 921600;
-    dcbSerialParams.ByteSize = 8;
-    dcbSerialParams.StopBits = ONESTOPBIT;
-    dcbSerialParams.Parity = NOPARITY;
-    if (!SetCommState(hSerial, &dcbSerialParams))
-    {
-        cout << "error setting serial port state\n";
-        return 1;
-    }
-    // GKV Settings
+    /* Serial Port Settings For Windows */
+    if (!(InitSerialPort(com_port, 921600))) return 1;
+    /* GKV Settings */
     GKV->SetReceivedPacketCallback(RecognisePacket);//Set User Callback for Each Parsed GKV Packet
     GKV->SetReceiveDataFunction(ReadCOM);//Set User Function That Receives Data From Serial Port And Returns Received Byte
     GKV->SetSendDataFunction(WriteCOM);//Set User Function That Sends Data to Serial Port connected to GKV
@@ -64,7 +36,39 @@ int main()
     return 0;
 }
 
-
+bool InitSerialPort(string port_name, int32_t baudrate)
+{
+    hSerial = ::CreateFileA(port_name.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    if (hSerial == INVALID_HANDLE_VALUE)
+    {
+        if (GetLastError() == ERROR_FILE_NOT_FOUND)
+        {
+            cout << "serial port does not exist.\n";
+            return 0;
+        }
+        cout << "some other error occurred.\n";
+        return 0;
+    }
+    cout << "#connect ok\n";
+    DCB dcbSerialParams = { 0 };
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+    if (!GetCommState(hSerial, &dcbSerialParams))
+    {
+        cout << "getting state error\n";
+        return 0;
+    }
+    cout << "#get state ok\n";
+    dcbSerialParams.BaudRate = baudrate;
+    dcbSerialParams.ByteSize = 8;
+    dcbSerialParams.StopBits = ONESTOPBIT;
+    dcbSerialParams.Parity = NOPARITY;
+    if (!SetCommState(hSerial, &dcbSerialParams))
+    {
+        cout << "error setting serial port state\n";
+        return 0;
+    }
+    return 1;
+}
 
 void WriteCOM(PacketBase* buf)
 {
@@ -76,7 +80,7 @@ void WriteCOM(PacketBase* buf)
 char ReadCOM()
 {
     DWORD iSize;
-    char sReceivedChar;
+    char sReceivedChar = 0;
     char iRet = 0;
     while (true)
     {
@@ -84,160 +88,165 @@ char ReadCOM()
         if (iSize > 0)
             return sReceivedChar;
     }
+    return 0;
 }
 
 void RecognisePacket(PacketBase* buf)
 {
     char str[30];
-
     switch (buf->type)
     {
-        case GKV_ADC_CODES_PACKET:
+    case GKV_ADC_CODES_PACKET:
+    {
+        ADCData* packet;
+        packet = (ADCData*)&buf->data;
+        cout << "ADC Data Packet: ";
+        sprintf(str, "%d", packet->sample_cnt);
+        cout << "Sample Counter = " << str << ' ';
+        sprintf(str, "%d", packet->a[0]);
+        cout << "ax = " << str << ' ';
+        sprintf(str, "%d", packet->a[1]);
+        cout << "ay = " << str << ' ';
+        sprintf(str, "%d", packet->a[2]);
+        cout << "az = " << str << ' ';
+        sprintf(str, "%d", packet->w[0]);
+        cout << "wx = " << str << ' ';
+        sprintf(str, "%d", packet->w[1]);
+        cout << "wy = " << str << ' ';
+        sprintf(str, "%d", packet->w[2]);
+        cout << "wz = " << str << endl;
+        break;
+    }
+    case GKV_RAW_DATA_PACKET:
+    {
+        RawData* packet;
+        packet = (RawData*)&buf->data;
+        cout << "Raw Sensors Data Packet: ";
+        sprintf(str, "%d", packet->sample_cnt);
+        cout << "Sample Counter = " << str << ' ';
+        sprintf(str, "%f", packet->a[0]);
+        cout << "ax = " << str << ' ';
+        sprintf(str, "%f", packet->a[1]);
+        cout << "ay = " << str << ' ';
+        sprintf(str, "%f", packet->a[2]);
+        cout << "az = " << str << ' ';
+        sprintf(str, "%f", packet->w[0]);
+        cout << "wx = " << str << ' ';
+        sprintf(str, "%f", packet->w[1]);
+        cout << "wy = " << str << ' ';
+        sprintf(str, "%f", packet->w[2]);
+        cout << "wz = " << str << endl;
+        break;
+    }
+    case GKV_EULER_ANGLES_PACKET:
+    {
+        GyrovertData* packet;
+        packet = (GyrovertData*)&buf->data;
+        cout << "Gyrovert Data Packet: ";
+        sprintf(str, "%d", packet->sample_cnt);
+        cout << "Sample Counter = " << str << ' ';
+        sprintf(str, "%f", packet->yaw);
+        cout << "yaw = " << str << ' ';
+        sprintf(str, "%f", packet->pitch);
+        cout << "pitch = " << str << ' ';
+        sprintf(str, "%f", packet->roll);
+        cout << "roll = " << str << endl;
+        break;
+    }
+    case GKV_INCLINOMETER_PACKET:
+    {
+        InclinometerData* packet;
+        packet = (InclinometerData*)&buf->data;
+        sprintf(str, "%d", packet->sample_cnt);
+        cout << "Sample Counter = " << str << ' ';
+        sprintf(str, "%f", packet->alfa);
+        cout << "alfa = " << str << ' ';
+        sprintf(str, "%f", packet->beta);
+        cout << "beta = " << str << endl;
+        break;
+    }
+    case GKV_BINS_PACKET:
+    {
+        BINSData* packet;
+        packet = (BINSData*)&buf->data;
+        cout << "BINS Data Packet: ";
+        sprintf(str, "%d", packet->sample_cnt);
+        cout << "Sample Counter = " << str << ' ';
+        sprintf(str, "%f", packet->x);
+        cout << "x = " << str << ' ';
+        sprintf(str, "%f", packet->y);
+        cout << "y = " << str << ' ';
+        sprintf(str, "%f", packet->z);
+        cout << "z = " << str << ' ';
+        sprintf(str, "%f", packet->alfa);
+        cout << "alfa = " << str << ' ';
+        sprintf(str, "%f", packet->beta);
+        cout << "beta = " << str << ' ';
+        sprintf(str, "%f", packet->q[0]);
+        cout << "q0 = " << str << ' ';
+        sprintf(str, "%f", packet->q[1]);
+        cout << "q1 = " << str << ' ';
+        sprintf(str, "%f", packet->q[2]);
+        cout << "q2 = " << str << ' ';
+        sprintf(str, "%f", packet->q[3]);
+        cout << "q3 = " << str << ' ';
+        sprintf(str, "%f", packet->yaw);
+        cout << "yaw = " << str << ' ';
+        sprintf(str, "%f", packet->pitch);
+        cout << "pitch = " << str << ' ';
+        sprintf(str, "%f", packet->roll);
+        cout << "roll = " << str << endl;
+        break;
+    }
+    case GKV_GNSS_PACKET:
+    {
+        GpsData* packet;
+        packet = (GpsData*)&buf->data;
+        cout << "GNSS Data Packet: ";
+        sprintf(str, "%f", packet->time);
+        cout << "time = " << str << ' ';
+        sprintf(str, "%f", packet->latitude);
+        cout << "latitude = " << str << ' ';
+        sprintf(str, "%f", packet->longitude);
+        cout << "longitude = " << str << ' ';
+        sprintf(str, "%f", packet->altitude);
+        cout << "altitude = " << str << ' ';
+        sprintf(str, "%d", packet->state_status);
+        cout << "state_status = " << str << ' ';
+        sprintf(str, "%f", packet->TDOP);
+        cout << "TDOP = " << str << ' ';
+        sprintf(str, "%f", packet->HDOP);
+        cout << "HDOP = " << str << ' ';
+        sprintf(str, "%f", packet->VDOP);
+        cout << "VDOP = " << str << endl;
+        break;
+    }
+    case GKV_CUSTOM_PACKET:
+    {
+        CustomData* packet;
+        packet = (CustomData*)&buf->data;
+        cout << "CustomPacket: ";
+        for (uint8_t i = 0; i < ((buf->length) / 4); i++)
         {
-            ADCData* packet;
-            packet = (ADCData*)&buf->data;
-            cout << "ADC Data Packet: ";
-            sprintf_s(str, "%d", packet->sample_cnt);
-            cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%d", packet->a[0]);
-            cout << "ax = " << str << ' ';
-            sprintf_s(str, "%d", packet->a[1]);
-            cout << "ay = " << str << ' ';
-            sprintf_s(str, "%d", packet->a[2]);
-            cout << "az = " << str << ' ';
-            sprintf_s(str, "%d", packet->w[0]);
-            cout << "wx = " << str << ' ';
-            sprintf_s(str, "%d", packet->w[1]);
-            cout << "wy = " << str << ' ';
-            sprintf_s(str, "%d", packet->w[2]);
-            cout << "wz = " << str << endl;
-            break;
-        }
-        case GKV_RAW_DATA_PACKET:
-        {
-            RawData* packet;
-            packet = (RawData*)&buf->data;
-            cout << "Raw Sensors Data Packet: ";
-            sprintf_s(str, "%d", packet->sample_cnt);
-            cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%f", packet->a[0]);
-            cout << "ax = " << str << ' ';
-            sprintf_s(str, "%f", packet->a[1]);
-            cout << "ay = " << str << ' ';
-            sprintf_s(str, "%f", packet->a[2]);
-            cout << "az = " << str << ' ';
-            sprintf_s(str, "%f", packet->w[0]);
-            cout << "wx = " << str << ' ';
-            sprintf_s(str, "%f", packet->w[1]);
-            cout << "wy = " << str << ' ';
-            sprintf_s(str, "%f", packet->w[2]);
-            cout << "wz = " << str << endl;
-            break;
-        }
-        case GKV_EULER_ANGLES_PACKET:
-        {
-            GyrovertData* packet;
-            packet = (GyrovertData*)&buf->data;
-            cout << "Gyrovert Data Packet: ";
-            sprintf_s(str, "%d", packet->sample_cnt);
-            cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%f", packet->yaw);
-            cout << "yaw = " << str << ' ';
-            sprintf_s(str, "%f", packet->pitch);
-            cout << "pitch = " << str << ' ';
-            sprintf_s(str, "%f", packet->roll);
-            cout << "roll = " << str << endl;
-            break;
-        }
-        case GKV_INCLINOMETER_PACKET:
-        {
-            InclinometerData* packet;
-            packet = (InclinometerData*)&buf->data;
-            sprintf_s(str, "%d", packet->sample_cnt);
-            cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%f", packet->alfa);
-            cout << "alfa = " << str << ' ';
-            sprintf_s(str, "%f", packet->beta);
-            cout << "beta = " << str << endl;
-            break;
-        }
-        case GKV_BINS_PACKET:
-        {
-            BINSData* packet;
-            packet = (BINSData*)&buf->data;
-            cout << "BINS Data Packet: ";
-            sprintf_s(str, "%d", packet->sample_cnt);
-            cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%f", packet->x);
-            cout << "x = " << str << ' ';
-            sprintf_s(str, "%f", packet->y);
-            cout << "y = " << str << ' ';
-            sprintf_s(str, "%f", packet->z);
-            cout << "z = " << str << ' ';
-            sprintf_s(str, "%f", packet->alfa);
-            cout << "alfa = " << str << ' ';
-            sprintf_s(str, "%f", packet->beta);
-            cout << "beta = " << str << ' ';
-            sprintf_s(str, "%f", packet->q[0]);
-            cout << "q0 = " << str << ' ';
-            sprintf_s(str, "%f", packet->q[1]);
-            cout << "q1 = " << str << ' ';
-            sprintf_s(str, "%f", packet->q[2]);
-            cout << "q2 = " << str << ' ';
-            sprintf_s(str, "%f", packet->q[3]);
-            cout << "q3 = " << str << ' ';
-            sprintf_s(str, "%f", packet->yaw);
-            cout << "yaw = " << str << ' ';
-            sprintf_s(str, "%f", packet->pitch);
-            cout << "pitch = " << str << ' ';
-            sprintf_s(str, "%f", packet->roll);
-            cout << "roll = " << str << endl;
-            break;
-        }
-        case GKV_GNSS_PACKET:
-        {
-            GpsData* packet;
-            packet = (GpsData*)&buf->data;
-            cout << "GNSS Data Packet: ";
-            sprintf_s(str, "%f", packet->time);
-            cout << "time = " << str << ' ';
-            sprintf_s(str, "%f", packet->latitude);
-            cout << "latitude = " << str << ' ';
-            sprintf_s(str, "%f", packet->longitude);
-            cout << "longitude = " << str << ' ';
-            sprintf_s(str, "%f", packet->altitude);
-            cout << "altitude = " << str << ' ';
-            sprintf_s(str, "%d", packet->state_status);
-            cout << "state_status = " << str << ' ';
-            sprintf_s(str, "%f", packet->TDOP);
-            cout << "TDOP = " << str << ' ';
-            sprintf_s(str, "%f", packet->HDOP);
-            cout << "HDOP = " << str << ' ';
-            sprintf_s(str, "%f", packet->VDOP);
-            cout << "VDOP = " << str << endl;
-            break;
-        }
-        case GKV_CUSTOM_PACKET:
-        {
-            CustomData* packet;
-            packet = (CustomData*)&buf->data;
-            cout << "CustomPacket: ";
-            for (uint8_t i = 0; i < ((buf->length)/4); i++)
+            if (packet->parameter[i] == packet->parameter[i])// проверка на isnan
             {
-                if (packet->parameter[i] == packet->parameter[i])// проверка на isnan
-                {
-                    sprintf_s(str, "%f", (packet->parameter[i]));
-                    cout << "param = " << str << ' ';
-                }
-                else
-                {
-                    cout << "param = NaN ";
-                }
+                sprintf(str, "%f", (packet->parameter[i]));
+                cout << "param = " << str << ' ';
             }
-            cout << endl;
-            break;
+            else
+            {
+                cout << "param = NaN ";
+            }
         }
-        // Примечание: в данном примере вывод значений некоторых параметров наборного пакета с пометкой int будет некорректен, поскольку данная программа  
-        // не посылает запроса на получение номеров парамеров наборного пакета и выводит все параметры, как float.
+        cout << endl;
+        break;
+    }
+    //Примечание: в данном примере вывод значений некоторых параметров наборного пакета с пометкой int будет некорректен, поскольку данная программа
+    //не посылает запроса на получение номеров парамеров наборного пакета и выводит все параметры, как float.
     }
 }
+#else
+int main()
+{
+}
+#endif

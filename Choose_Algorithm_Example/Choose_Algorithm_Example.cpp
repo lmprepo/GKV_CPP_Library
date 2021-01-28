@@ -1,15 +1,17 @@
-﻿#include <windows.h>
+﻿#ifdef _WIN32
+#include <windows.h>
 #include <iostream>
 #include <stdio.h>
 #include "LMP_Device.h"
 using namespace std;
-
 HANDLE hSerial;
+
 string input;
 uint8_t algorithm = ADC_CODES_ALGORITHM;
 uint8_t algorithm_packet = 0;
 uint8_t algorithm_selected = 0;
 
+bool InitSerialPort(string port_name, int32_t baudrate);
 char ReadCOM();
 void WriteCOM(PacketBase* buf);
 void RecognisePacket(PacketBase* buf);
@@ -25,43 +27,13 @@ int main()
     cout << "#start connecting to " << com_port << "\n";
     /*Create LMP Device Object GKV*/
     LMP_Device* GKV = new LMP_Device();
-    /*Serial Port Settings For Windows*/
-    std::string sPortName = "\\\\.\\" + std::string(com_port);
-    hSerial = ::CreateFileA(sPortName.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-    if (hSerial == INVALID_HANDLE_VALUE)
-    {
-        if (GetLastError() == ERROR_FILE_NOT_FOUND)
-        {
-            cout << "serial port does not exist.\n";
-            return 1;
-        }
-        cout << "some other error occurred.\n";
-        return 1;
-    }
-    cout << "#connect ok\n";
-    DCB dcbSerialParams = { 0 };
-    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-    if (!GetCommState(hSerial, &dcbSerialParams))
-    {
-        cout << "getting state error\n";
-        return 1;
-    }
-    cout << "#get state ok\n";
-    dcbSerialParams.BaudRate = 921600;
-    dcbSerialParams.ByteSize = 8;
-    dcbSerialParams.StopBits = ONESTOPBIT;
-    dcbSerialParams.Parity = NOPARITY;
-    if (!SetCommState(hSerial, &dcbSerialParams))
-    {
-        cout << "error setting serial port state\n";
-        return 1;
-    }
-    cout << "#set state ok\n";
+    /*Serial Port Settings For Windows */
+    if (!(InitSerialPort(com_port, 921600))) return 1;
     /* GKV Settings*/
     GKV->SetReceivedPacketCallback(RecognisePacket);//Set User Callback for Each Parsed GKV Packet
     GKV->SetReceiveDataFunction(ReadCOM);//Set User Function That Receives Data From Serial Port And Returns Received Byte
     GKV->SetSendDataFunction(WriteCOM);//Set User Function That Sends Data to Serial Port connected to GKV
-    GKV->RunDevice();//Run Thread For Receiving Data From GKV  
+    GKV->RunDevice();//Run Thread For Receiving Data From GKV
 
     printf("Choose GKV algorithm:\n");
     printf("0 - ADC Codes Data from Sensors\n");
@@ -73,7 +45,7 @@ int main()
     printf("7 - Custom Algorithm\n");
     printf("8 - Navigation Data GNSS+BINS\n");
     printf("9 - Navigation Data GNSS+BINS type 2\n");
-
+    /* Select Algorithm Number and Check It */
     cout << "Selected Algorithm = ";
     do
     {
@@ -85,16 +57,17 @@ int main()
         }
         else
         {
-            printf_s("Wrong value. Try Again. Selected Algorithm = ");
+            cout << "Wrong value. Try Again. Selected Algorithm = ";
             algorithm = 255;
         }
     } while (!(check_input(input)));
     algorithm_packet = ChooseAlgorithmPacket(algorithm);
-
+    /* Set Selected Algorithm */
     while (!(algorithm_selected))
     {
         GKV->SetAlgorithm(algorithm);
     }
+    cout << "#start main loop\n";
     while (1)
     {
         //do something
@@ -102,24 +75,60 @@ int main()
     return 0;
 }
 
+
+bool InitSerialPort(string port_name, int32_t baudrate)
+{
+    hSerial = ::CreateFileA(port_name.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    if (hSerial == INVALID_HANDLE_VALUE)
+    {
+        if (GetLastError() == ERROR_FILE_NOT_FOUND)
+        {
+            cout << "serial port does not exist.\n";
+            return 0;
+        }
+        cout << "some other error occurred.\n";
+        return 0;
+    }
+    cout << "#connect ok\n";
+    DCB dcbSerialParams = { 0 };
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+    if (!GetCommState(hSerial, &dcbSerialParams))
+    {
+        cout << "getting state error\n";
+        return 0;
+    }
+    cout << "#get state ok\n";
+    dcbSerialParams.BaudRate = baudrate;
+    dcbSerialParams.ByteSize = 8;
+    dcbSerialParams.StopBits = ONESTOPBIT;
+    dcbSerialParams.Parity = NOPARITY;
+    if (!SetCommState(hSerial, &dcbSerialParams))
+    {
+        cout << "error setting serial port state\n";
+        return 0;
+    }
+    return 1;
+}
+
 void WriteCOM(PacketBase* buf)
 {
-    DWORD dwBytesWritten;
-    char iRet = WriteFile(hSerial, buf, buf->length + 8, &dwBytesWritten, NULL);
-    Sleep(1);
+        DWORD dwBytesWritten;
+        char iRet = WriteFile(hSerial, buf, buf->length + 8, &dwBytesWritten, NULL);
+        Sleep(1);
 }
 
 char ReadCOM()
 {
-    DWORD iSize;
-    char sReceivedChar;
-    char iRet = 0;
-    while (true)
-    {
-        iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
-        if (iSize > 0)
-            return sReceivedChar;
-    }
+        DWORD iSize;
+        char sReceivedChar;
+        char iRet = 0;
+        while (true)
+        {
+            iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
+            if (iSize > 0)
+                return sReceivedChar;
+        }
+    return 0;
 }
 
 
@@ -130,7 +139,7 @@ uint8_t check_input(string str)
         return 0;
     }
     char char_array[2];
-    strcpy_s(char_array, str.c_str());
+    strcpy(char_array, str.c_str());
     if (!(isdigit(char_array[0])))
     {
         return 0;
@@ -210,19 +219,19 @@ void RecognisePacket(PacketBase* buf)
             ADCData* packet;
             packet = (ADCData*)&buf->data;
             cout << "ADC Data Packet: ";
-            sprintf_s(str, "%d", packet->sample_cnt);
+            sprintf(str, "%d", packet->sample_cnt);
             cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%d", packet->a[0]);
+            sprintf(str, "%d", packet->a[0]);
             cout << "ax = " << str << ' ';
-            sprintf_s(str, "%d", packet->a[1]);
+            sprintf(str, "%d", packet->a[1]);
             cout << "ay = " << str << ' ';
-            sprintf_s(str, "%d", packet->a[2]);
+            sprintf(str, "%d", packet->a[2]);
             cout << "az = " << str << ' ';
-            sprintf_s(str, "%d", packet->w[0]);
+            sprintf(str, "%d", packet->w[0]);
             cout << "wx = " << str << ' ';
-            sprintf_s(str, "%d", packet->w[1]);
+            sprintf(str, "%d", packet->w[1]);
             cout << "wy = " << str << ' ';
-            sprintf_s(str, "%d", packet->w[2]);
+            sprintf(str, "%d", packet->w[2]);
             cout << "wz = " << str << endl;
             break;
         }
@@ -231,19 +240,19 @@ void RecognisePacket(PacketBase* buf)
             RawData* packet;
             packet = (RawData*)&buf->data;
             cout << "Raw Sensors Data Packet: ";
-            sprintf_s(str, "%d", packet->sample_cnt);
+            sprintf(str, "%d", packet->sample_cnt);
             cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%f", packet->a[0]);
+            sprintf(str, "%f", packet->a[0]);
             cout << "ax = " << str << ' ';
-            sprintf_s(str, "%f", packet->a[1]);
+            sprintf(str, "%f", packet->a[1]);
             cout << "ay = " << str << ' ';
-            sprintf_s(str, "%f", packet->a[2]);
+            sprintf(str, "%f", packet->a[2]);
             cout << "az = " << str << ' ';
-            sprintf_s(str, "%f", packet->w[0]);
+            sprintf(str, "%f", packet->w[0]);
             cout << "wx = " << str << ' ';
-            sprintf_s(str, "%f", packet->w[1]);
+            sprintf(str, "%f", packet->w[1]);
             cout << "wy = " << str << ' ';
-            sprintf_s(str, "%f", packet->w[2]);
+            sprintf(str, "%f", packet->w[2]);
             cout << "wz = " << str << endl;
             break;
         }
@@ -252,13 +261,13 @@ void RecognisePacket(PacketBase* buf)
             GyrovertData* packet;
             packet = (GyrovertData*)&buf->data;
             cout << "Gyrovert Data Packet: ";
-            sprintf_s(str, "%d", packet->sample_cnt);
+            sprintf(str, "%d", packet->sample_cnt);
             cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%f", packet->yaw);
+            sprintf(str, "%f", packet->yaw);
             cout << "yaw = " << str << ' ';
-            sprintf_s(str, "%f", packet->pitch);
+            sprintf(str, "%f", packet->pitch);
             cout << "pitch = " << str << ' ';
-            sprintf_s(str, "%f", packet->roll);
+            sprintf(str, "%f", packet->roll);
             cout << "roll = " << str << endl;
             break;
         }
@@ -266,11 +275,11 @@ void RecognisePacket(PacketBase* buf)
         {
             InclinometerData* packet;
             packet = (InclinometerData*)&buf->data;
-            sprintf_s(str, "%d", packet->sample_cnt);
+            sprintf(str, "%d", packet->sample_cnt);
             cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%f", packet->alfa);
+            sprintf(str, "%f", packet->alfa);
             cout << "alfa = " << str << ' ';
-            sprintf_s(str, "%f", packet->beta);
+            sprintf(str, "%f", packet->beta);
             cout << "beta = " << str << endl;
             break;
         }
@@ -279,31 +288,31 @@ void RecognisePacket(PacketBase* buf)
             BINSData* packet;
             packet = (BINSData*)&buf->data;
             cout << "BINS Data Packet: ";
-            sprintf_s(str, "%d", packet->sample_cnt);
+            sprintf(str, "%d", packet->sample_cnt);
             cout << "Sample Counter = " << str << ' ';
-            sprintf_s(str, "%f", packet->x);
+            sprintf(str, "%f", packet->x);
             cout << "x = " << str << ' ';
-            sprintf_s(str, "%f", packet->y);
+            sprintf(str, "%f", packet->y);
             cout << "y = " << str << ' ';
-            sprintf_s(str, "%f", packet->z);
+            sprintf(str, "%f", packet->z);
             cout << "z = " << str << ' ';
-            sprintf_s(str, "%f", packet->alfa);
+            sprintf(str, "%f", packet->alfa);
             cout << "alfa = " << str << ' ';
-            sprintf_s(str, "%f", packet->beta);
+            sprintf(str, "%f", packet->beta);
             cout << "beta = " << str << ' ';
-            sprintf_s(str, "%f", packet->q[0]);
+            sprintf(str, "%f", packet->q[0]);
             cout << "q0 = " << str << ' ';
-            sprintf_s(str, "%f", packet->q[1]);
+            sprintf(str, "%f", packet->q[1]);
             cout << "q1 = " << str << ' ';
-            sprintf_s(str, "%f", packet->q[2]);
+            sprintf(str, "%f", packet->q[2]);
             cout << "q2 = " << str << ' ';
-            sprintf_s(str, "%f", packet->q[3]);
+            sprintf(str, "%f", packet->q[3]);
             cout << "q3 = " << str << ' ';
-            sprintf_s(str, "%f", packet->yaw);
+            sprintf(str, "%f", packet->yaw);
             cout << "yaw = " << str << ' ';
-            sprintf_s(str, "%f", packet->pitch);
+            sprintf(str, "%f", packet->pitch);
             cout << "pitch = " << str << ' ';
-            sprintf_s(str, "%f", packet->roll);
+            sprintf(str, "%f", packet->roll);
             cout << "roll = " << str << endl;
             break;
         }
@@ -312,21 +321,21 @@ void RecognisePacket(PacketBase* buf)
             GpsData* packet;
             packet = (GpsData*)&buf->data;
             cout << "GNSS Data Packet: ";
-            sprintf_s(str, "%f", packet->time);
+            sprintf(str, "%f", packet->time);
             cout << "time = " << str << ' ';
-            sprintf_s(str, "%f", packet->latitude);
+            sprintf(str, "%f", packet->latitude);
             cout << "latitude = " << str << ' ';
-            sprintf_s(str, "%f", packet->longitude);
+            sprintf(str, "%f", packet->longitude);
             cout << "longitude = " << str << ' ';
-            sprintf_s(str, "%f", packet->altitude);
+            sprintf(str, "%f", packet->altitude);
             cout << "altitude = " << str << ' ';
-            sprintf_s(str, "%d", packet->state_status);
+            sprintf(str, "%d", packet->state_status);
             cout << "state_status = " << str << ' ';
-            sprintf_s(str, "%f", packet->TDOP);
+            sprintf(str, "%f", packet->TDOP);
             cout << "TDOP = " << str << ' ';
-            sprintf_s(str, "%f", packet->HDOP);
+            sprintf(str, "%f", packet->HDOP);
             cout << "HDOP = " << str << ' ';
-            sprintf_s(str, "%f", packet->VDOP);
+            sprintf(str, "%f", packet->VDOP);
             cout << "VDOP = " << str << endl;
             break;
         }
@@ -339,7 +348,7 @@ void RecognisePacket(PacketBase* buf)
             {
                 if (packet->parameter[i] == packet->parameter[i])// проверка на isnan
                 {
-                    sprintf_s(str, "%f", (packet->parameter[i]));
+                    sprintf(str, "%f", (packet->parameter[i]));
                     cout << "param = " << str << ' ';
                 }
                 else
@@ -349,13 +358,18 @@ void RecognisePacket(PacketBase* buf)
             }
             cout << endl;
             break;
-        }               
         }
-    // Примечание: в данном примере вывод значений некоторых параметров наборного пакета с пометкой int будет некорректен, поскольку данная программа  
-    // не посылает запроса на получение номеров парамеров наборного пакета и выводит все параметры, как float.
+        //Примечание: в данном примере вывод значений некоторых параметров наборного пакета с пометкой int будет некорректен, поскольку данная программа
+        //не посылает запроса на получение номеров парамеров наборного пакета и выводит все параметры, как float.
+        }
     }
     else
     {
         if (buf->type == algorithm_packet) algorithm_selected = 1;
     }
 }
+#else
+int main()
+{
+}
+#endif
