@@ -12,8 +12,8 @@ uint8_t algorithm_selected = 0;
 
 bool InitSerialPort(string port_name, int32_t baudrate);
 char ReadCOM();
-void WriteCOM(PacketBase* buf);
-void ShowPacketData(ADCData* buf);
+void WriteCOM(GKV_PacketBase* buf);
+void ShowPacketData(GKV_ADCData* buf);
 
 int main()
 {
@@ -33,7 +33,7 @@ int main()
     GKV->RunDevice();//Run Thread For Receiving Data From GKV
     while (!(algorithm_selected))
     {
-        GKV->SetAlgorithm(ADC_CODES_ALGORITHM);
+        GKV->SetAlgorithm(GKV_ADC_CODES_ALGORITHM);
     }
     cout << "#start main loop\n";
     while (1)
@@ -77,7 +77,7 @@ bool InitSerialPort(string port_name, int32_t baudrate)
     return 1;
 }
 
-void WriteCOM(PacketBase* buf)
+void WriteCOM(GKV_PacketBase* buf)
 {
     DWORD dwBytesWritten;
     char iRet = WriteFile(hSerial, buf, buf->length + 8, &dwBytesWritten, NULL);
@@ -98,7 +98,7 @@ char ReadCOM()
     return 0;
 }
 
-void ShowPacketData(ADCData* packet)
+void ShowPacketData(GKV_ADCData* packet)
 {
     char str[30];
     sprintf(str, "%d", packet->sample_cnt);

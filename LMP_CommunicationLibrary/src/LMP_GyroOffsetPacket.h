@@ -54,29 +54,23 @@
 /** 
   * @brief  Packet 0x1C is used as command to calculate compensation coefficients of gyro axis using N samples (field "samples") (send only)
   */
-typedef struct __GyroOffsetCalc
+typedef struct __GKV_GyroOffsetCalc
 {
 	uint32_t samples; /*	number of samples for calculating gyro offset	*/
-}GyroOffsetCalc;
+}GKV_GyroOffsetCalc;
 
-
-
-/** 
-  * @brief  Packet 0x1D is used to request coefficients of gyro axis (send only)
-  */
-typedef struct __GetGyroOffset{}GetGyroOffset;
 
 
 /** 
   * @brief  Packet 0x1E with compensation coefficients of gyro axis (send/receive)
   */
-typedef struct __GyroOffset
+typedef struct __GKV_GyroOffset
 {
 	int32_t x_900; /*	custom (send) or current (receive)	gyro offset for X axis in 24-bit ADC codes */
 	int32_t y_900; /*	custom (send) or current (receive)	gyro offset for Y axis in 24-bit ADC codes */
 	int32_t z_900; /*	custom (send) or current (receive)	gyro offset for Z axis in 24-bit ADC codes */
 	int32_t reserved[9];
-}GyroOffset;
+}GKV_GyroOffset;
 
 
 

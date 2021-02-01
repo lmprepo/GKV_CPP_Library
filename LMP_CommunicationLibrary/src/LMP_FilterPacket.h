@@ -52,34 +52,29 @@
   * @brief 		settings for "type" field of request/response packet 0x20 (FIR filter settings)
   * @{
   */
-#define TYPE_DOWNSAMPLE 												        0x00				/*	set output data as last data from 24 KHz */
-#define TYPE_DOWN_OVERSAMPLE 												    0x01				/*	??? */
-#define TYPE_AVE 						                                        0x02				/*	set output data as an average of adc data */
-#define TYPE_FIR             						                            0x03				/*	turn on IIR Filter */
-#define TYPE_IIR             						                            0x04				/*	turn on IIR Filter */
-#define TYPE_MULTISTAGE_FIR_1K 										            0x05				/*	Fd=Fs/K0, Fs=24 KHz, K0=24, Fpass=250 Hz*/
-#define TYPE_MULTISTAGE_FIR_2K 										            0x06				/*	Fd=Fs/K0, Fs=24 KHz, K0=12, Fpass=250 Hz*/
-#define TYPE_MULTISTAGE_FIR_4K 										            0x07				/*	Fd=Fs/K0, Fs=24 KHz, K0=6, Fpass=250 Hz*/
-#define TYPE_MULTISTAGE_FIR_8K 										            0x08				/*	Fd=Fs/K0, Fs=24 KHz, K0=3, Fpass=250 Hz*/
+#define GKV_TYPE_DOWNSAMPLE 												        0x00				/*	set output data as last data from 24 KHz */
+#define GKV_TYPE_DOWN_OVERSAMPLE 												    0x01				/*	??? */
+#define GKV_TYPE_AVE 						                                        0x02				/*	set output data as an average of adc data */
+#define GKV_TYPE_FIR             						                            0x03				/*	turn on IIR Filter */
+#define GKV_TYPE_IIR             						                            0x04				/*	turn on IIR Filter */
+#define GKV_TYPE_MULTISTAGE_FIR_1K 										            0x05				/*	Fd=Fs/K0, Fs=24 KHz, K0=24, Fpass=250 Hz*/
+#define GKV_TYPE_MULTISTAGE_FIR_2K 										            0x06				/*	Fd=Fs/K0, Fs=24 KHz, K0=12, Fpass=250 Hz*/
+#define GKV_TYPE_MULTISTAGE_FIR_4K 										            0x07				/*	Fd=Fs/K0, Fs=24 KHz, K0=6, Fpass=250 Hz*/
+#define GKV_TYPE_MULTISTAGE_FIR_8K 										            0x08				/*	Fd=Fs/K0, Fs=24 KHz, K0=3, Fpass=250 Hz*/
 /**
   * @}
   */
 
 
 /** 
-  * @brief  Request packet 0x1F to ask gkv filter settings (send only)
-  */
-typedef struct __GetFilter {} GetFilter;
-
-/** 
   * @brief  Packet 0x20 is used to get or set parameters of FIR filter (send/receive)
   */
-typedef struct __Filter
+typedef struct __GKV_Filter
 {
 	uint8_t type;							                    /*	cut frequency of FIR filter or selecting IIR/AWE/Downsample. Sampling Frequency = 24 KHz. Cut frequency of inertial sensors = 250 Hz	*/
 	uint8_t fir_len;                                            /*	data length for filtering when FIR filter is on	*/
 	uint8_t iir_len;                                            /*	data length for filtering when IIR filter is on	*/
 	uint16_t movave_len;					                    /*	simple moving average length for simple filtering when FIR and IIR filter is off	*/
-}Filter;
+}GKV_Filter;
 
 #endif

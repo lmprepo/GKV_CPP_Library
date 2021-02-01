@@ -53,11 +53,11 @@
   * @brief 		settings for "selftest_commands" field of request packet 0x28 (command to start one of device selftest depending on "command" and "parameters" fields)
   * @{
   */
-#define SELFTEST_OFF 											        0x00            /*  individual test off     */
-#define REQ_SELFTEST_RESULT 							                0x01            /*  request the current state (results of the last test)    */
-#define START_SELFTEST 										            0x02            /*  self-test starts, upon completion, GKV sends frame 41 with results  */
-#define START_CUSTOM_TEST 								                0x03            /*  run an individual test according to the code    */
-#define CUSTOM_TEST_OFF 									            0x04            /*  individual test off */
+#define GKV_SELFTEST_OFF 											        0x00            /*  individual test off     */
+#define GKV_REQ_SELFTEST_RESULT 							                0x01            /*  request the current state (results of the last test)    */
+#define GKV_START_SELFTEST 										            0x02            /*  self-test starts, upon completion, GKV sends frame 41 with results  */
+#define GKV_START_CUSTOM_TEST 								                0x03            /*  run an individual test according to the code    */
+#define GKV_CUSTOM_TEST_OFF 									            0x04            /*  individual test off */
 /**
   * @}
   */
@@ -68,11 +68,11 @@
   * @brief 		settings for "selftest_params" field of request packet 0x28 (command to start one of device selftest depending on "command" and "parameters" fields)
   * @{
   */
-#define GYRO_POSITIVE_SELFTEST 						                    0x00                    /*  run test of rate sensor positive axis direction  */
-#define GYRO_NEGATIVE_SELFTEST 						                    0x01                    /*  run test of rate sensor negative axis direction  */
-#define ACCEL_X_SELFTEST 								            	0x02                    /*  run test of accelerometer X axis */
-#define ACCEL_Y_SELFTEST 								            	0x03                    /*  run test of accelerometer Y axis */
-#define ACCEL_Z_SELFTEST 									            0x04                    /*  run test of accelerometer Z axis */
+#define GKV_GYRO_POSITIVE_SELFTEST 						                    0x00                    /*  run test of rate sensor positive axis direction  */
+#define GKV_GYRO_NEGATIVE_SELFTEST 						                    0x01                    /*  run test of rate sensor negative axis direction  */
+#define GKV_ACCEL_X_SELFTEST 								            	0x02                    /*  run test of accelerometer X axis */
+#define GKV_ACCEL_Y_SELFTEST 								            	0x03                    /*  run test of accelerometer Y axis */
+#define GKV_ACCEL_Z_SELFTEST 									            0x04                    /*  run test of accelerometer Z axis */
 /**
   * @}
   */
@@ -81,11 +81,11 @@
 /** 
   * @brief  Packet 0x28 is used as command to start one of device selftest depending on "cmd" and "mode" fields (send only) 
   */
-typedef struct __SelfTest
+typedef struct __GKV_SelfTest
 {
 	uint32_t cmd;           					                /*	code of selftest settings	*/
 	uint32_t mode;          					                /*	code for selection selftest type	*/
-}SelfTest;
+}GKV_SelfTest;
 
 
 /*---------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
@@ -95,9 +95,9 @@ typedef struct __SelfTest
   * @brief 		parameters for  "gyro_selftest_result" field of packet 0x29 (results of device selftest)
   * @{
   */
-#define GYRO_Z_ERROR 											        1<<2                    /*  selftest detected rate sensor X axis error  */
-#define GYRO_Y_ERROR 											        1<<1                    /*  selftest detected rate sensor Y axis error  */
-#define GYRO_X_ERROR 											        1                       /*  selftest detected rate sensor Z axis error  */
+#define GKV_GYRO_Z_ERROR 											        1<<2                    /*  selftest detected rate sensor X axis error  */
+#define GKV_GYRO_Y_ERROR 											        1<<1                    /*  selftest detected rate sensor Y axis error  */
+#define GKV_GYRO_X_ERROR 											        1                       /*  selftest detected rate sensor Z axis error  */
 /**
   * @}
   */
@@ -108,9 +108,9 @@ typedef struct __SelfTest
   * @brief 		parameters for  "accel_selftest_result" field of packet 0x29 (results of device selftest)
   * @{
   */
-#define ACCEL_Z_ERROR 										            1<<2                /*  selftest detected accelerometer X axis error  */
-#define ACCEL_Y_ERROR 										            1<<1                /*  selftest detected accelerometer Y axis error  */
-#define ACCEL_X_ERROR 										            1                   /*  selftest detected accelerometer Y axis error  */
+#define GKV_ACCEL_Z_ERROR 										            1<<2                /*  selftest detected accelerometer X axis error  */
+#define GKV_ACCEL_Y_ERROR 										            1<<1                /*  selftest detected accelerometer Y axis error  */
+#define GKV_ACCEL_X_ERROR 										            1                   /*  selftest detected accelerometer Y axis error  */
 /**
   * @}
   */
@@ -120,11 +120,11 @@ typedef struct __SelfTest
 /** 
   * @brief 	Packet 0x29 with results of device selftest (receive only)
   */
-typedef struct __SelfTestResult
+typedef struct __GKV_SelfTestResult
 {
 	uint32_t gyro_result;                                       /*	detected errors in accelerometer test	*/
 	uint32_t acc_result;                                        /*	detected errors in rate sensor test	*/
-}SelfTestResult;
+}GKV_SelfTestResult;
 
 
 

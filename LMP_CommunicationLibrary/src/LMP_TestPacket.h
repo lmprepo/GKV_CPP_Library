@@ -55,10 +55,10 @@
   * @brief 	device mode for "mode" field of response packet 0x05 (identification device parameters)
   * @{
   */ 
-#define MODE_BOOTLOADER_ERR 							0x00                                /*  bootloader mode error (no working firmware)    */
-#define MODE_BOOTLOADER_OK 							    0x01                                /*  bootloader mode ok (no working firmware)    */
-#define MODE_WORK 								        0x02                                /*  working firmware mode   */
-#define MODE_INAPP_BOOTLOADER 							0x03                                /*  bootloader mode with working firmware   */
+#define GKV_MODE_BOOTLOADER_ERR 							0x00                                /*  bootloader mode error (no working firmware)    */
+#define GKV_MODE_BOOTLOADER_OK 							    0x01                                /*  bootloader mode ok (no working firmware)    */
+#define GKV_MODE_WORK 								        0x02                                /*  working firmware mode   */
+#define GKV_MODE_INAPP_BOOTLOADER 							0x03                                /*  bootloader mode with working firmware   */
 /**
   * @}
   */
@@ -71,35 +71,28 @@
   * @brief 	status_bits for "status" field of each response packet	
   * @{
   */ 
-#define GNSS_TIMESTAMP 									1<<11								/* synchronization bit for GNSS receiver	*/
-#define DEV_SETTING_FINISHED 							1<<10								/* set as 1 after defice selfconfiguration finish (in orientation or navigation algorithms)	*/
-#define AZ_ERROR 										1<<9								/*  accelerometer X axis hardware error  */
-#define AY_ERROR 										1<<8								/*  accelerometer Y axis hardware error  */
-#define AX_ERROR 										1<<7                                /*  accelerometer Z axis hardware error  */
-#define WZ_ERROR 										1<<6                                /*  rate sensor X axis hardware error  */
-#define WY_ERROR 										1<<5                                /*  rate sensor Y axis hardware error  */
-#define WX_ERROR 										1<<4                                /*  rate sensors Z axis hardware error  */
-#define ADC_ERROR 							    		1<<3                                /*  ADC hardware error  */
-#define ADC_LOST_DATA 									1<<2                                /*  ADC software error  */
-#define BUFFER_OVERRUN 									1<<1                                /*  Data Submission Queue Overflow  */
-#define SYNC_INPUT 										1									/*	1 - sync pin voltage > 2,5V, 0 - sync pin voltage < 0.5 V	*/
+#define GKV_GNSS_TIMESTAMP 									1<<11								/* synchronization bit for GNSS receiver	*/
+#define GKV_DEV_SETTING_FINISHED 							1<<10								/* set as 1 after defice selfconfiguration finish (in orientation or navigation algorithms)	*/
+#define GKV_AZ_ERROR 										1<<9								/*  accelerometer X axis hardware error  */
+#define GKV_AY_ERROR 										1<<8								/*  accelerometer Y axis hardware error  */
+#define GKV_AX_ERROR 										1<<7                                /*  accelerometer Z axis hardware error  */
+#define GKV_WZ_ERROR 										1<<6                                /*  rate sensor X axis hardware error  */
+#define GKV_WY_ERROR 										1<<5                                /*  rate sensor Y axis hardware error  */
+#define GKV_WX_ERROR 										1<<4                                /*  rate sensors Z axis hardware error  */
+#define GKV_ADC_ERROR 							    		1<<3                                /*  ADC hardware error  */
+#define GKV_ADC_LOST_DATA 									1<<2                                /*  ADC software error  */
+#define GKV_BUFFER_OVERRUN 									1<<1                                /*  Data Submission Queue Overflow  */
+#define GKV_SYNC_INPUT 										1									/*	1 - sync pin voltage > 2,5V, 0 - sync pin voltage < 0.5 V	*/
 /**
   * @}
   */
-#endif
-
-
-/** 
-  * @brief  Request packet 0x04 to ask main id parameters of device (send only)
-  */
-typedef struct __GetTest {} GetTest;
-
+#endif
 
 
 /** 
   * @brief  Response packet 0x05 with main id parameters of device (receive only)
   */
-typedef struct __Test
+typedef struct __GKV_ID
 {
 
 	uint16_t bootloader_version;                            /*	version of embended software	*/
@@ -109,7 +102,7 @@ typedef struct __Test
 	char description[16];                                   /*	device code	in ASCII */
 	uint8_t mode;                                           /*	used in the  manufacturing phase	*/
 	uint16_t status;                                        /*	field for detecting errors, sync and algorithm state	*/
-}Test;
+}GKV_ID;
 
 
 #endif

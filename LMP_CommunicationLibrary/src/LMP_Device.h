@@ -56,7 +56,7 @@ namespace Gyrovert
     {
     public:
         LMP_Device();
-        LMP_Device(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr));
+        LMP_Device(void(*ptrSendPacketFun)(GKV_PacketBase* Output_Packet_Ptr));
         ~LMP_Device();
         void RunDevice();
         void Send_Data();
@@ -67,7 +67,7 @@ namespace Gyrovert
         uint8_t parseCycle();
         uint8_t parse();
         uint8_t refind_preamble(int start);
-        uint8_t check(PacketBase* pack);
+        uint8_t check(GKV_PacketBase* pack);
         uint8_t put(uint8_t b);
         void SetAlgorithm(uint8_t algorithm_register_value);
         void SetBaudrate(uint8_t baudrate_register_value);
@@ -83,19 +83,19 @@ namespace Gyrovert
         void RequestCustomPacketParams();
 
         uint8_t GetInputPacketType();
-        void SetSendDataFunction(void(*ptrSendPacketFun)(PacketBase* Output_Packet_Ptr));
-        void SetReceivedPacketCallback(void(*ptrReceivedPacketProcessingFun)(PacketBase* Input_Packet_Ptr));
-        void SetSettingsReceivedCallback(void(*ptrReceivedPacketProcessingFun)(Settings* settings));
-        void SetCustomPacketParamReceivedCallback(void(*ptrReceivedPacketProcessingFun)(CustomDataParam* param));
-        void SetCustomPacketReceivedCallback(void(*ptrReceivedPacketProcessingFun)(CustomData* data));
-        void SetADCDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(ADCData* data));
-        void SetRawDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(RawData* data));
-        void SetGyrovertDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GyrovertData* data));
-        void SetInclinometerDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(InclinometerData* data));
-        void SetBINSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(BINSData* data));
-        void SetBINS2DataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(BINS2Data* data));
-        void SetGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GpsData* data));
-        void SetExtGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GpsDataExt* data));
+        void SetSendDataFunction(void(*ptrSendPacketFun)(GKV_PacketBase* Output_Packet_Ptr));
+        void SetReceivedPacketCallback(void(*ptrReceivedPacketProcessingFun)(GKV_PacketBase* Input_Packet_Ptr));
+        void SetSettingsReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_Settings* settings));
+        void SetCustomPacketParamReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_CustomDataParam* param));
+        void SetCustomPacketReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_CustomData* data));
+        void SetADCDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_ADCData* data));
+        void SetRawDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_RawData* data));
+        void SetGyrovertDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GyrovertData* data));
+        void SetInclinometerDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_InclinometerData* data));
+        void SetBINSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_BINSData* data));
+        void SetBINS2DataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_BINS2Data* data));
+        void SetGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GpsData* data));
+        void SetExtGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GpsDataExt* data));
 
         void SetReceiveDataFunction(char(*ptrRecPacketFun)());
         void clear() { CTR = 0; }
@@ -104,29 +104,29 @@ namespace Gyrovert
 
         void dataNewThreadReceiveFcn();
         void SendEmptyPacket(uint8_t type);
-        void RecognisePacket(PacketBase* buf);
+        void RecognisePacket(GKV_PacketBase* buf);
 
 
         std::thread Receiver;
 
-        uint8_t InputPacket[sizeof(PacketBase)] = { 0 };
-        PacketBase* Output_Packet = new PacketBase;
-        PacketBase* CurrentReceivedPacket = new PacketBase;
+        uint8_t InputPacket[sizeof(GKV_PacketBase)] = { 0 };
+        GKV_PacketBase* Output_Packet = new GKV_PacketBase;
+        GKV_PacketBase* CurrentReceivedPacket = new GKV_PacketBase;
         uint32_t CTR = 0;
-        void(*ptrSendFun)(PacketBase* Output_Packet_Ptr) = NULL;
-        void(*ptrPacketProcessingFun)(PacketBase* Input_Packet_Ptr) = NULL;
-        void(*ptrSettingsPacketCallback)(Settings* settings) = NULL;
-        void(*ptrCustomPacketParamCallback)(CustomDataParam* param) = NULL;
-        void(*ptrDeviceIDCallback)(Test* data) = NULL;
-        void(*ptrADCPacketCallback)(ADCData* data) = NULL;
-        void(*ptrRawDataPacketCallback)(RawData* data) = NULL;
-        void(*ptrGyrovertDataPacketCallback)(GyrovertData* data) = NULL;
-        void(*ptrInclinometerDataPacketCallback)(InclinometerData* data) = NULL;
-        void(*ptrBINSDataPacketCallback)(BINSData* data) = NULL;
-        void(*ptrBINS2DataPacketCallback)(BINS2Data* data) = NULL;
-        void(*ptrGNSSDataPacketCallback)(GpsData* data) = NULL;
-        void(*ptrExtGNSSDataPacketCallback)(GpsDataExt* data) = NULL;
-        void(*ptrCustomDataPacketCallback)(CustomData* data) = NULL;
+        void(*ptrSendFun)(GKV_PacketBase* Output_Packet_Ptr) = NULL;
+        void(*ptrPacketProcessingFun)(GKV_PacketBase* Input_Packet_Ptr) = NULL;
+        void(*ptrSettingsPacketCallback)(GKV_Settings* settings) = NULL;
+        void(*ptrCustomPacketParamCallback)(GKV_CustomDataParam* param) = NULL;
+        void(*ptrDeviceIDCallback)(GKV_ID* data) = NULL;
+        void(*ptrADCPacketCallback)(GKV_ADCData* data) = NULL;
+        void(*ptrRawDataPacketCallback)(GKV_RawData* data) = NULL;
+        void(*ptrGyrovertDataPacketCallback)(GKV_GyrovertData* data) = NULL;
+        void(*ptrInclinometerDataPacketCallback)(GKV_InclinometerData* data) = NULL;
+        void(*ptrBINSDataPacketCallback)(GKV_BINSData* data) = NULL;
+        void(*ptrBINS2DataPacketCallback)(GKV_BINS2Data* data) = NULL;
+        void(*ptrGNSSDataPacketCallback)(GKV_GpsData* data) = NULL;
+        void(*ptrExtGNSSDataPacketCallback)(GKV_GpsDataExt* data) = NULL;
+        void(*ptrCustomDataPacketCallback)(GKV_CustomData* data) = NULL;
 
 
         bool CheckConnectionRequestedFlag = false;
@@ -140,9 +140,9 @@ namespace Gyrovert
 
         struct __DeviceState
         {
-            Test GeneralDeviceParameters;
-            Settings CurrentSettings;
-            CustomDataParam CurrentCustomPacketParameters;
+            GKV_ID GeneralDeviceParameters;
+            GKV_Settings CurrentSettings;
+            GKV_CustomDataParam CurrentCustomPacketParameters;
         }DeviceState;
 
         char (*ptrRecFcn)(void) = NULL;
