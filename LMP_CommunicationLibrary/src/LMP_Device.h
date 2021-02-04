@@ -15,7 +15,6 @@ namespace Gyrovert
 #include "LMP_AlorithmPackets.h"
 #include "LMP_CustomPacket.h"
 #include "LMP_FilterPacket.h"
-#include "LMP_SelfTestPacket.h"
 #include "LMP_AlgParamPacket.h"
 #include "LMP_GyroOffsetPacket.h"
 

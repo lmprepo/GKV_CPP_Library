@@ -48,8 +48,9 @@
   * @brief 	status_bits for "status" field of each response packet	
   * @{
   */ 
-#define GKV_GNSS_TIMESTAMP 									1<<11								/* synchronization bit for GNSS receiver	*/
-#define GKV_DEV_SETTING_FINISHED 							1<<10								/* set as 1 after defice selfconfiguration finish (in orientation or navigation algorithms)	*/
+#define GKV_GNSS_TIMESTAMP 									1<<12								/* synchronization bit for GNSS receiver	*/
+#define GKV_DEV_SETTING_FINISHED 							1<<11								/* set as 1 after defice selfconfiguration finish (in orientation or navigation algorithms)	*/
+#define GKV_SYNC_SIGNAL_LEVEL								1<<10								/* set as 1 if sync signal input level more than 2.5 v, set as 0 if sync signal input level less than 0.5 v */
 #define GKV_AZ_ERROR 										1<<9								/*  accelerometer X axis hardware error  */
 #define GKV_AY_ERROR 										1<<8								/*  accelerometer Y axis hardware error  */
 #define GKV_AX_ERROR 										1<<7                                /*  accelerometer Z axis hardware error  */
@@ -222,50 +223,6 @@ typedef struct __GKV_BINSData
 	float beta;									                /*	inclinometer angle beta	YZ  */
 	float q[4];				                                    /*	orientation quaternion q3 q2 q1 q0	*/
 }GKV_BINSData;
-
-
-/*-----------------------------------------------EXTENDED_BINS_ALGORITHM------------------------------------------------------------*/
-
-/** @defgroup   EXTENDED_BINS_PACKET_CODE
-  * @brief    packet code for "type" field of received packet
-  * @{
-  */
-#define GKV_BINS2_PACKET 								0x14								/*	type of data packet with extended navigation and orientation data */
-/**
-  * @}
-  */
-
-
-/** 
-  * @brief  BINS2 algorithm. Packet 0x14 with navigation data as position (x,y,z), Euler angles, inclinometer angles and orientation quaternion (receive only)   !!!!
-  */
-typedef struct __GKV_BINS2Data
-{
-	uint16_t sample_cnt; 			                            /*  0-65535 counter to detect number of lost packets */
-	uint16_t status; 				                            /* field for detecting errors, sync and algorithm state */
-	float ax; 		                                            /* Проекция вектора кажущегося ускорения центра масс УР в связной СК	Ax	4	float32	м / с2	Пределы изменения ±100*/
-	float ay; 		                                            /* Проекция вектора кажущегося ускорения центра масс УР в связной СК	Ay	4	float32	м / с2	Пределы изменения ±100*/
-	float az; 		                                            /* Проекция вектора кажущегося ускорения центра масс УР в связной СК	Az	4	float32	м / с2	Пределы изменения ±100*/
-	float astart; 	                                            /* Выходной сигнал стартового акселерометра	Axx	4	float32	м / с2	Пределы изменения 0..12000*/
-	float vx; 		                                            /* Проекции вектора линейной скорости центра масс УР в стартовой СК	Vx	4	float32	м / с	Пределы изменения ±800*/
-	float vy; 		                                            /* Проекции вектора линейной скорости центра масс УР в стартовой СК	Vy	4	float32	м / с	Пределы изменения ±800*/
-	float vz; 		                                            /* Проекции вектора линейной скорости центра масс УР в стартовой СК	Vz	4	float32	м / с	Пределы изменения ±800*/
-	float vstart; 	                                            /* Начальное условие интегрирования(стартовая скорость УР)	Vxx	4	float32	м / с*/
-	float x; 		                                            /* Координаты центра масс УР в стартовой СК	X	4	float32	м	Пределы изменения ±7000*/
-	float y; 		                                            /* Координаты центра масс УР в стартовой СК	Y	4	float32	м	Пределы изменения ±7000*/
-	float z; 		                                            /* Координаты центра масс УР в стартовой СК	Z	4	float32	м	Пределы изменения ±7000*/
-	float wx; 		                                            /* Проекции вектора угловой скорости корпуса УР в связанной СК	wx	4	float32	° / c	Пределы изменения ±400*/
-	float wy; 		                                            /* Проекции вектора угловой скорости корпуса УР в связанной СК	wy	4	float32	° / c	Пределы изменения ±400*/
-	float wz; 		                                            /* Проекции вектора угловой скорости корпуса УР в связанной СК	wz	4	float32	° / c	Пределы изменения ±400*/
-	float yaw; 		                                            /* Угол курса корпуса УР в стартовой СК	yaw	4	float32	рад.Пределы изменения 0..2 pi*/
-	float pitch; 	                                            /* Угол тангажа корпуса УР в стартовой СК	pitch	4	float32	рад	Пределы изменения - pi / 2..pi / 2*/
-	float roll; 		                                        /* Угол крена корпуса УР в стартовой СК	roll	4	float32	рад	Пределы изменения - pi..pi*/
-	float alfa; 		                                        /* Начальные углы ориентации корпуса УР в канале ствола(выходные сигналы инклинометра)	theta0	4	float32	рад.Пределы изменения - pi..pi*/
-	float beta; 		                                        /*gamma0	4		рад*/
-	float q[4]; 		                                        /* Элементы текущего кватерниона ориентации связанной СК относительно инерциальной СК	q0	4	float32*/
-	uint16_t time; 	                                            /* Текущее время работы БИНС	Tбинс	2	uint16	мс	Пределы изменения 0.. 65 536*/
-}GKV_BINS2Data;
-
 
 
 /*-----------------------------------------------GNSS_NAVIGATION_ALGORITHM------------------------------------------------------------*/
