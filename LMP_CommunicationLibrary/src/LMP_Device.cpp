@@ -143,17 +143,6 @@ namespace Gyrovert
 	}
 
 	/**
-	  * @name	SetBINS2DataReceivedCallback
-	  * @brief  Function sets pointer on user function for processing received and parsed Extended BINS Data packet (type 0x14) from LMP Device
-	  * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed Extended BINS Data structure
-	  * @retval no return value.
-	  */
-	void LMP_Device::SetBINS2DataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_BINS2Data* data))
-	{
-		ptrBINS2DataPacketCallback = ptrReceivedPacketProcessingFun;
-	}
-
-	/**
 	  * @name	SetGNSSDataReceivedCallback
 	  * @brief  Function sets pointer on user function for processing received and parsed GNSS Data packet (type 0x0E) from LMP Device
 	  * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed GNSS Data structure
@@ -612,16 +601,6 @@ namespace Gyrovert
 			if (ptrBINSDataPacketCallback)
 			{
 				ptrBINSDataPacketCallback(&data);
-			}
-			break;
-		}
-		case GKV_BINS2_PACKET:
-		{
-			GKV_BINS2Data data;
-			memcpy(&(data), &(buf->data), sizeof(data));
-			if (ptrBINS2DataPacketCallback)
-			{
-				ptrBINS2DataPacketCallback(&data);
 			}
 			break;
 		}

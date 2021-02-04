@@ -92,7 +92,6 @@ namespace Gyrovert
         void SetGyrovertDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GyrovertData* data));
         void SetInclinometerDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_InclinometerData* data));
         void SetBINSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_BINSData* data));
-        void SetBINS2DataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_BINS2Data* data));
         void SetGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GpsData* data));
         void SetExtGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GpsDataExt* data));
 
@@ -122,7 +121,6 @@ namespace Gyrovert
         void(*ptrGyrovertDataPacketCallback)(GKV_GyrovertData* data) = NULL;
         void(*ptrInclinometerDataPacketCallback)(GKV_InclinometerData* data) = NULL;
         void(*ptrBINSDataPacketCallback)(GKV_BINSData* data) = NULL;
-        void(*ptrBINS2DataPacketCallback)(GKV_BINS2Data* data) = NULL;
         void(*ptrGNSSDataPacketCallback)(GKV_GpsData* data) = NULL;
         void(*ptrExtGNSSDataPacketCallback)(GKV_GpsDataExt* data) = NULL;
         void(*ptrCustomDataPacketCallback)(GKV_CustomData* data) = NULL;
