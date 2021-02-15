@@ -5,4 +5,5 @@ cmake_minimum_required (VERSION 3.8)
 
 add_executable (Receive_Data_in_Console_linux Receive_Data_in_Console_linux.cpp)
 
-target_link_libraries(Receive_Data_in_Console_linux PRIVATE LMP_CommunicationLibrary)
+target_link_libraries(Receive_Data_in_Console_linux
+    PRIVATE LMP_CommunicationLibrary)

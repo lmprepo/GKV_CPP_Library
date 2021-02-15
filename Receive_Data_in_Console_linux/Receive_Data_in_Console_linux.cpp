@@ -18,6 +18,7 @@ void RecognisePacket(GKV_PacketBase* buf);
 
 int main()
 {
+
     /* Select Serial Port */
     string com_port;
     cout << "Set Serial Port:";
@@ -39,6 +40,7 @@ int main()
     }
     return 0;
 }
+
 
 bool InitSerialPort(string port_name, int32_t baudrate)
 {
@@ -90,11 +92,11 @@ void WriteCOM(GKV_PacketBase* buf)
 char ReadCOM()
 {
     char sReceivedChar;
-        while (true)
-        {
-            int iOut = read(SerialPortHandle, &sReceivedChar, 1);
-            return sReceivedChar;
-        }
+    while (true)
+    {
+        int iOut = read(SerialPortHandle, &sReceivedChar, 1);
+        return sReceivedChar;
+    }
     return 0;
 }
 

@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <iostream>
 #include <string.h>
+#include <stdio.h>
+#include <functional>
 #include <thread>
 #ifdef __linux
 #include <pthread.h>
@@ -74,6 +76,8 @@ namespace Gyrovert
         void SetCustomAlgorithmPacket();
         void SetCustomPacketParam(uint8_t* param_array_ptr, uint8_t quantity_of_params);
 
+        virtual void WriteDataToGKV(GKV_PacketBase* data) {};
+        virtual char ReadDataFromGKV() { return 0; };
 
         void CheckConnection();
         void RequestDeviceID();
@@ -82,20 +86,19 @@ namespace Gyrovert
         void RequestCustomPacketParams();
 
         uint8_t GetInputPacketType();
-        void SetSendDataFunction(void(*ptrSendPacketFun)(GKV_PacketBase* Output_Packet_Ptr));
-        void SetReceivedPacketCallback(void(*ptrReceivedPacketProcessingFun)(GKV_PacketBase* Input_Packet_Ptr));
-        void SetSettingsReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_Settings* settings));
-        void SetCustomPacketParamReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_CustomDataParam* param));
-        void SetCustomPacketReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_CustomData* data));
-        void SetADCDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_ADCData* data));
-        void SetRawDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_RawData* data));
-        void SetGyrovertDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GyrovertData* data));
-        void SetInclinometerDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_InclinometerData* data));
-        void SetBINSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_BINSData* data));
-        void SetGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GpsData* data));
-        void SetExtGNSSDataReceivedCallback(void(*ptrReceivedPacketProcessingFun)(GKV_GpsDataExt* data));
-
-        void SetReceiveDataFunction(char(*ptrRecPacketFun)());
+        void SetSendDataFunction(std::function<void(GKV_PacketBase *)>ptrSendPacketFun);
+        void SetReceivedPacketCallback(std::function<void(GKV_PacketBase *)> ptrReceivedPacketProcessingFun);
+        void SetSettingsReceivedCallback(std::function<void(GKV_Settings *)> ptrReceivedPacketProcessingFun);
+        void SetCustomPacketParamReceivedCallback(std::function<void(GKV_CustomDataParam *)> ptrReceivedPacketProcessingFun);
+        void SetCustomPacketReceivedCallback(std::function<void(GKV_CustomData *)>ptrReceivedPacketProcessingFun);
+        void SetADCDataReceivedCallback(std::function<void(GKV_ADCData *)> ptrReceivedPacketProcessingFun);
+        void SetRawDataReceivedCallback(std::function<void(GKV_RawData *)> ptrReceivedPacketProcessingFun);
+        void SetGyrovertDataReceivedCallback(std::function<void(GKV_GyrovertData *)> ptrReceivedPacketProcessingFun);
+        void SetInclinometerDataReceivedCallback(std::function<void(GKV_InclinometerData *)>ptrReceivedPacketProcessingFun);
+        void SetBINSDataReceivedCallback(std::function<void(GKV_BINSData *)> ptrReceivedPacketProcessingFun);
+        void SetGNSSDataReceivedCallback(std::function<void(GKV_GpsData *)>ptrReceivedPacketProcessingFun);
+        void SetExtGNSSDataReceivedCallback(std::function<void(GKV_GpsDataExt *)>ptrReceivedPacketProcessingFun);
+        void SetReceiveDataFunction(std::function<char()>ptrRecPacketFun);
         void clear() { CTR = 0; }
 
     private:
@@ -103,6 +106,7 @@ namespace Gyrovert
         void dataNewThreadReceiveFcn();
         void SendEmptyPacket(uint8_t type);
         void RecognisePacket(GKV_PacketBase* buf);
+        std::function<void(GKV_PacketBase *)> GKV_PacketProcessingCallback = nullptr;
 
 
         std::thread Receiver;
@@ -111,19 +115,18 @@ namespace Gyrovert
         GKV_PacketBase* Output_Packet = new GKV_PacketBase;
         GKV_PacketBase* CurrentReceivedPacket = new GKV_PacketBase;
         uint32_t CTR = 0;
-        void(*ptrSendFun)(GKV_PacketBase* Output_Packet_Ptr) = NULL;
-        void(*ptrPacketProcessingFun)(GKV_PacketBase* Input_Packet_Ptr) = NULL;
-        void(*ptrSettingsPacketCallback)(GKV_Settings* settings) = NULL;
-        void(*ptrCustomPacketParamCallback)(GKV_CustomDataParam* param) = NULL;
-        void(*ptrDeviceIDCallback)(GKV_ID* data) = NULL;
-        void(*ptrADCPacketCallback)(GKV_ADCData* data) = NULL;
-        void(*ptrRawDataPacketCallback)(GKV_RawData* data) = NULL;
-        void(*ptrGyrovertDataPacketCallback)(GKV_GyrovertData* data) = NULL;
-        void(*ptrInclinometerDataPacketCallback)(GKV_InclinometerData* data) = NULL;
-        void(*ptrBINSDataPacketCallback)(GKV_BINSData* data) = NULL;
-        void(*ptrGNSSDataPacketCallback)(GKV_GpsData* data) = NULL;
-        void(*ptrExtGNSSDataPacketCallback)(GKV_GpsDataExt* data) = NULL;
-        void(*ptrCustomDataPacketCallback)(GKV_CustomData* data) = NULL;
+        std::function<void(GKV_PacketBase *)>ptrSendFun = nullptr;
+        std::function<void(GKV_Settings *)> ptrSettingsPacketCallback=nullptr;
+        std::function<void(GKV_CustomDataParam *)> ptrCustomPacketParamCallback = nullptr;
+        std::function<void(GKV_ID *)>ptrDeviceIDCallback = nullptr;
+        std::function<void(GKV_ADCData *)> ptrADCPacketCallback = nullptr;
+        std::function<void(GKV_RawData *)> ptrRawDataPacketCallback = nullptr;
+        std::function<void(GKV_GyrovertData *)>ptrGyrovertDataPacketCallback = nullptr;
+        std::function<void(GKV_InclinometerData *)>ptrInclinometerDataPacketCallback = nullptr;
+        std::function<void(GKV_BINSData *)>ptrBINSDataPacketCallback = nullptr;
+        std::function<void(GKV_GpsData *)>ptrGNSSDataPacketCallback = nullptr;
+        std::function<void(GKV_GpsDataExt *)>ptrExtGNSSDataPacketCallback = nullptr;
+        std::function<void(GKV_CustomData *)>ptrCustomDataPacketCallback = nullptr;
 
 
         bool CheckConnectionRequestedFlag = false;
@@ -142,7 +145,7 @@ namespace Gyrovert
             GKV_CustomDataParam CurrentCustomPacketParameters;
         }DeviceState;
 
-        char (*ptrRecFcn)(void) = NULL;
+        std::function<char()>ptrRecFcn = nullptr;
         enum EStatus
         {
             NOT_ENOUGH,
