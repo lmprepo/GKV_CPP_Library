@@ -70,5 +70,6 @@ typedef struct __GKV_PacketBase
 
 #define GKV_CHECK_PACKET								0x00								/*	type of empty packet (with length = 0) to check connection (send to GKV) (send to GKV) */
 #define GKV_CONFIRM_PACKET							 	0x00								/*	type of empty packet (with length = 0) to confirm request receiving	(receive from GKV) */
+#define GKV_RESET_PACKET							 	0x01								/*	type of empty packet (with length = 0) to reset GKV */
 
-#endif
+#endif

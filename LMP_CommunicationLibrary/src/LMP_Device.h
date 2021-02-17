@@ -84,6 +84,8 @@ namespace Gyrovert
         void RequestSettings();
         void RequestData();
         void RequestCustomPacketParams();
+        void ResetDevice();
+
 
         uint8_t GetInputPacketType();
         void SetSendDataFunction(std::function<void(GKV_PacketBase *)>ptrSendPacketFun);
