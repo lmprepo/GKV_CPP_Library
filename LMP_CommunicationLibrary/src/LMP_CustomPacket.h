@@ -154,7 +154,7 @@ typedef struct __GKV_CustomData
 #define GKV_ALG_ALT														    0X5D					/*	altitude, calculated by BINS in float32	*/
 #define GKV_GNSS_INT_LAT											        0X5E					/*	latitude from GNSS in codes (to convert into radians multiply 2*pi/(2^32))	*/
 #define GKV_GNSS_INT_LON											        0X5F					/*	longitude from GNSS in codes (to convert into radians multiply 2*pi/(2^32))	*/
-#define GKV_GNSS_INT_ALT											        0X60					/*	altitude from GNSS in codes (to convert into radians multiply 2*pi/(2^32))	*/
+#define GKV_ALG_STATE_STATUS										        0X60					/*	altitude from GNSS in codes (to convert into radians multiply 2*pi/(2^32))	*/
 #define GKV_BAROMETER_ADC											        0X61					/*	Barometer data in codes	*/
 #define GKV_ALG_VAR_X													    0X62					/*	variance of position error of X axis in m2	*/
 #define GKV_ALG_VAR_Y													    0X63					/*	variance of position error of Y axis in m2	*/
@@ -172,7 +172,117 @@ typedef struct __GKV_CustomData
   * @}
   */
 
-
+/**
+  * @brief  Structure with all custom parameters.
+  */
+typedef struct __GKV_AllParameters
+{
+    float    STATUS; 													    					/* device status */
+    float    SAMPLE_COUNTER; 									            					/*	16-bit sample counter to control lost packets (changes from 0 to 65535)	*/
+    float    NAX; 																				/*	non-calibrated data from X axis of accelerometer 	*/
+    float    NAY; 																				/*	non-calibrated data from Y axis of accelerometer 	*/
+    float    NAZ; 																				/*	non-calibrated data from Z axis of accelerometer 	*/
+    float    NWX;																				/*	non-calibrated data from X axis of gyroscope 	*/
+    float    NWY;																				/*	non-calibrated data from Y axis of gyroscope 	*/
+    float    NWZ;																				/*	non-calibrated data from Z axis of gyroscope 	*/
+    float    NT0;																				/*	non-calibrated data from 0 channel of 12-bit adc of MCU (temperature 0)	*/
+    float    NT1;																				/*	non-calibrated data from 1 channel of 12-bit adc of MCU (temperature 1)	*/
+    float    NT2;																				/*	non-calibrated data from 2 channel of 12-bit adc of MCU (temperature 2)	*/
+    float    NT3;																				/*	non-calibrated data from 3 channel of 12-bit adc of MCU (temperature 3)	*/
+    float    NT4;																				/*	non-calibrated data from 4 channel of 12-bit adc of MCU (temperature 4)	*/
+    float    NT5;																				/*	non-calibrated data from 5 channel of 12-bit adc of MCU (temperature 5)	*/
+    float    NT6;																				/*	non-calibrated data from 6 channel of 12-bit adc of MCU (temperature 6)	*/
+    float    NT7;																				/*	non-calibrated data from 7 channel of 12-bit adc of MCU (temperature 7)	*/
+    float    NT8;																				/*	non-calibrated data from 8 channel of 12-bit adc of MCU (temperature 8)	*/
+    float    NT9;																				/*	non-calibrated data from 9 channel of 12-bit adc of MCU (temperature 9)	*/
+    float    AX;																				/*	calibrated data from X axis of accelerometer 	*/
+    float    AY;																				/*	calibrated data from Y axis of accelerometer 	*/
+    float    AZ;																				/*	calibrated data from Z axis of accelerometer 	*/
+    float    WX;																				/*	calibrated data from X axis of gyroscope 	*/
+    float    WY;																				/*	calibrated data from X axis of gyroscope	*/
+    float    WZ;																				/*	calibrated data from X axis of gyroscope	*/
+    float    T0;																				/*	calibrated data from 0 channel of 12-bit adc of MCU (temperature 0)	*/
+    float    T1;																				/*	calibrated data from 1 channel of 12-bit adc of MCU (temperature 1)	*/
+    float    T2;																				/*	calibrated data from 2 channel of 12-bit adc of MCU (temperature 2)	*/
+    float    T3;																				/*	calibrated data from 3 channel of 12-bit adc of MCU (temperature 3)	*/
+    float    T4;																				/*	calibrated data from 4 channel of 12-bit adc of MCU (temperature 4)	*/
+    float    T5;																				/*	calibrated data from 5 channel of 12-bit adc of MCU (temperature 5)	*/
+    float    T6;																				/*	calibrated data from 6 channel of 12-bit adc of MCU (temperature 6)	*/
+    float    T7;																				/*	calibrated data from 7 channel of 12-bit adc of MCU (temperature 7)	*/
+    float    T8;																				/*	calibrated data from 8 channel of 12-bit adc of MCU (temperature 8)	*/
+    float    T9;																				/*	calibrated data from 9 channel of 12-bit adc of MCU (temperature 9)	*/
+    float    ALPHA; 														    				/*	alpha angle of inclinometer	*/
+    float    BETA;																				/*	beta angle of inclinometer	*/
+    float    PITCH;														    					/*	pitch angle of euler orientation system	*/
+    float    ROLL;                                                                              /*	roll angle of euler orientation system	*/
+    float    YAW;                                                                               /*	yaw angle of euler orientation system	*/
+    float    Q0;                                                                                /*	scalar part of orientation quaternion	*/
+    float    Q1;                                                                                /*	x part of orientation quaternion	*/
+    float    Q2;                                                                                /*	y part of orientation quaternion	*/
+    float    Q3;                                                                                /*	z part of orientation quaternion	*/
+    float    X;                                                                                 /*	position x	*/
+    float    Y;                                                                                 /*	position y	*/
+    float    Z;                                                                                 /*	position z	*/
+    float    VX;                                                                                /*	linear velocity x	*/
+    float    VY;                                                                                /*	linear velocity y	*/
+    float    VZ;                                                                                /*	linear velocity z	*/
+    float    IWX;                                                                               /*	integrated angle from rate of x axis of gyro	*/
+    float    IWY;                                                                               /*	integrated angle from rate of y axis of gyro	*/
+    float    IWZ;                                                                               /*	integrated angle from rate of z axis of gyro	*/
+    float    YAW_NOPH;													    					/*	yaw angle without phase delay (when use_phase_corr = 1)*/
+    float    PITCH_NOPH;												        				/*	pitch angle without phase delay (when use_phase_corr = 1)*/
+    float    ROLL_NOPH;                                                                         /*	roll angle without phase delay (when use_phase_corr = 1)*/
+    float    ALG_INT_LAT_NOPH;									            					/*	latitude calculated using BINS in codes (to convert into radians multiply 2*pi/(2^32))  (when use_phase_corr = 1)*/
+    float    ALG_INT_LON_NOPH;									            					/*	longitude calculated using BINS in codes (to convert into radians multiply 2*pi/(2^32))  (when use_phase_corr = 1)*/
+    float    ALG_INT_ALT_NOPH;									            					/*	altitude calculated using BINS in m (when use_phase_corr = 1)*/
+    float       reserved[6];    /* parameter codes 0x3A:0x3F are reserved*/
+    float    LAX; 																				/*	linear acceleration x	*/
+    float    LAY;																				/*	linear acceleration y	*/
+    float    LAZ;																				/*	linear acceleration z	*/
+    float    AZIMUTH; 												    						/*	azimuth angle (when using GNSS)	*/
+    uint32_t UTC_TIME;												    						/*	Coordinated Universal Time (when using GNSS)	*/
+    float    LAT;                                                                               /*	latitude (when using GNSS)	*/
+    float    LON;                                                                               /*	longitude (when using GNSS)	*/
+    float    ALT;                                                                               /*	altitude (when using GNSS)	*/
+    uint32_t GNSS_STATUS;											        					/*	state of GNSS receiver	*/
+    float    GNSS_TDOP;                                                                         /*	geometry factor of GNSS receiver	*/
+    float    GNSS_HDOP;                                                                         /*	geometry factor of GNSS receiver	*/
+    float    GNSS_VDOP;                                                                         /*	geometry factor of GNSS receiver	*/
+    float    GNSS_VEL;                                                                          /*	horizontal velocity calculated using GNSS	*/
+    float    GNSS_YAW;                                                                          /*	yaw angle calculated using GNSS	*/
+    float    GNSS_ALT_VEL;										        						/*	verical velocity calculated using GNSS	*/
+    float    GNSS_SAT_NUM;										            					/*	number of sattelites using to calculate GNSS parameters	*/
+    float    MX;                                                                                /*	magnetometer data x	*/
+    float    MY;                                                                                /*	magnetometer data y	*/
+    float    MZ;                                                                                /*	magnetometer data z	*/
+    float    GNSS_LAT_VEL;                                                                      /*	velocity on latitude (using GNSS)	*/
+    float    GNSS_LON_VEL;                                                                      /*	velocity on longitude (using GNSS)	*/
+    float    GNSS_SIG_LAT;                                                                      /*	STD of latitude data	*/
+    float    GNSS_SIG_LON;                                                                      /*	STD of longitude data	*/
+    float    GNSS_SIG_ALT;                                                                      /*	STD of altitude data	*/
+    float    GNSS_SIG_VLAT;                                                                     /*	STD of velocity on latitude	*/
+    float    GNSS_SIG_VLON;                                                                     /*	STD of velocity on longitude	*/
+    float    GNSS_SIG_VALT;                                                                     /*	STD of velocity on altitude	*/
+    uint32_t ALG_INT_LAT;                                                                       /*	latitude, calculated by BINS in codes (to convert into radians multiply 2*pi/(2^32))	*/
+    uint32_t ALG_INT_LON;                                                                       /*	longitude, calculated by BINS in codes (to convert into radians multiply 2*pi/(2^32))	*/
+    float    ALG_ALT;                                                                           /*	altitude, calculated by BINS in float32	*/
+    uint32_t GNSS_INT_LAT;                                                                      /*	latitude from GNSS in codes (to convert into radians multiply 2*pi/(2^32))	*/
+    uint32_t GNSS_INT_LON;                                                                      /*	longitude from GNSS in codes (to convert into radians multiply 2*pi/(2^32))	*/
+    uint32_t ALG_STATE_STATUS;										        					/*	altitude from GNSS in codes (to convert into radians multiply 2*pi/(2^32))	*/
+    float    BAROMETER_ADC;                                                                     /*	Barometer data in codes	*/
+    float    ALG_VAR_X;                                                                         /*	variance of position error of X axis in m2	*/
+    float    ALG_VAR_Y;                                                                         /*	variance of position error of Y axis in m2	*/
+    float    ALG_VAR_Z;                                                                         /*	variance of position error of Z axis in m2	*/
+    float    ALG_VAR_VX;										        					/*	variance of velocity error of X axis in (m/s)^2	*/
+    float    ALG_VAR_VY;										        					/*	variance of velocity error of Y axis in (m/s)^2	*/
+    float    ALG_VAR_VZ;										        					/*	variance of velocity error of Z axis in (m/s)^2	*/
+    float    ALG_VAR_PSI;										        					/*	variance of orientation error of yaw axis in rad^2	*/
+    float    ALG_VAR_THETA;										        					/*	variance of orientation error of pitch axis in rad^2	*/
+    float    ALG_VAR_PHI;										        					/*	variance of orientation error of roll axis in rad^2	*/
+    uint32_t GPS_INT_X;										        					/*	X axis in ECEF coordinates in integer value (to convert into cm multiply 2*pi/(2^32))	*/
+    uint32_t GPS_INT_Y;										        					/*	Y axis in ECEF coordinates in integer value (to convert into cm multiply 2*pi/(2^32))	*/
+    uint32_t GPS_INT_Z;										        					/*	Z axis in ECEF coordinates in integer value (to convert into cm multiply 2*pi/(2^32))	*/
+}GKV_AllParameters;
 
 /** 
   * @brief  Packet 0x27 with list of parameters of custom packet (send/receive) 
@@ -207,7 +317,11 @@ typedef struct __GKV_CustomDataParam
   */
 typedef struct __GetData {}GetData;
 
+
+
+
+
 #endif
 
 
-#endif
+#endif
