@@ -66,9 +66,9 @@ int main()
         }
     } while (!(check_input(input)));
     algorithm_packet = ChooseAlgorithmPacket(algorithm);
-
     while (!(algorithm_selected))
     {
+        GKV->SetDefaultAlgorithmPacket();
         GKV->SetAlgorithm(algorithm);
     }
     while (1)

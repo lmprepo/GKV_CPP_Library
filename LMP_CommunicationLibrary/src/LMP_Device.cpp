@@ -340,7 +340,7 @@ namespace Gyrovert
         memset(&GKV_CustomDataParam, 0, sizeof(GKV_CustomDataParam));
         uint8_t type = GKV_CUSTOM_DATA_PARAM_PACKET;
         GKV_CustomDataParam.num = quantity_of_params;
-        memcpy(&(GKV_CustomDataParam.param), &param_array_ptr, quantity_of_params);
+        memcpy(&(GKV_CustomDataParam.param), param_array_ptr, quantity_of_params);
         Configure_Output_Packet(type, &GKV_CustomDataParam, sizeof(GKV_CustomDataParam));
         Send_Data();
     }

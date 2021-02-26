@@ -67,6 +67,7 @@ int main()
     /* Set Selected Algorithm */
     while (!(algorithm_selected))
     {
+        GKV->SetDefaultAlgorithmPacket();
         GKV->SetAlgorithm(algorithm);
     }
     cout << "#start main loop\n";

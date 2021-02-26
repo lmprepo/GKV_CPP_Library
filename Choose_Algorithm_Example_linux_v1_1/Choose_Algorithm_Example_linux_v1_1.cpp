@@ -2,7 +2,6 @@
 #include <iostream>
 #include <stdio.h>
 #include "GKV_Device.h"
-#include "ros/ros.h"
 using namespace Gyrovert;
 using namespace std;
 
@@ -59,6 +58,7 @@ int main()
 
     while (!(algorithm_selected))
     {
+        GKV->SetDefaultAlgorithmPacket();
         GKV->SetAlgorithm(algorithm);
     }
     while (1)

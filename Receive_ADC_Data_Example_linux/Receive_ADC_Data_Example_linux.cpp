@@ -34,6 +34,7 @@ int main()
     GKV->RunDevice();//Run Thread For Receiving Data From GKV
     while (!(algorithm_selected))
     {
+        GKV->SetDefaultAlgorithmPacket();
         GKV->SetAlgorithm(GKV_ADC_CODES_ALGORITHM);
     }
     cout << "#start main loop\n";
