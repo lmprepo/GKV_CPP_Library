@@ -1,6 +1,4 @@
 ﻿#ifdef _WIN32  
-#include <windows.h>
-
 #include <string>
 #include <iostream>
 #include <stdio.h>
@@ -22,17 +20,11 @@ int main()
     GKV->RunDevice();//Run Thread For Receiving Data From GKV
     GKV->StartWriteBinaryData();
     cout << "#start main loop\n";
-    Sleep(20000);
-    GKV->StopWriteBinaryData();
-    Sleep(1000);
-    GKV->StartWriteBinaryData();
-    cout << "#start main loop\n";
-    Sleep(20000);
-    GKV->StopWriteBinaryData();
     while (1)
     {
         //do something
     }
+    GKV->StopWriteBinaryData();
     return 0;
 }
 
