@@ -22,3 +22,7 @@ add_subdirectory (Receive_ADC_Data_Example_linux)
 add_subdirectory (Choose_Algorithm_Example_linux)
 
 add_subdirectory (Choose_Algorithm_Example_linux_v1_1)
+
+add_subdirectory (Console_Data_Logger_linux_v1_1)
+
+add_subdirectory (Console_Data_Logger_v1_1)

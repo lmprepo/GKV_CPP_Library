@@ -35,15 +35,20 @@
   */
 #ifndef LMP_DEVICE_H
 #define LMP_DEVICE_H
+#include <string>
 #include <stdint.h>
 #include <iostream>
 #include <string.h>
+#include <fstream>
 #include <stdio.h>
 #include <functional>
 #include <thread>
+#include <filesystem>
+
 #ifdef __linux
 #include <pthread.h>
 #endif
+
 namespace Gyrovert
 {
 #include "LMP_BasePacket.h"
@@ -95,6 +100,9 @@ namespace Gyrovert
         LMP_Device(void(*ptrSendPacketFun)(GKV_PacketBase* Output_Packet_Ptr));
         ~LMP_Device();
         void RunDevice();
+        void StartWriteBinaryData();
+        void StopWriteBinaryData(){ DataWritingEnabled = false; }
+
         void Send_Data();
         void Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t size);
         uint32_t crc32_compute(const void* buf, unsigned long size);
@@ -105,6 +113,7 @@ namespace Gyrovert
         uint8_t refind_preamble(int start);
         uint8_t check(GKV_PacketBase* pack);
         uint8_t put(uint8_t b);
+
         void SetAlgorithm(uint8_t algorithm_register_value);
         void SetBaudrate(uint8_t baudrate_register_value);
         void SetDefaultAlgorithmPacket();
@@ -121,8 +130,9 @@ namespace Gyrovert
         void RequestCustomPacketParams();
         void ResetDevice();
 
-
         uint8_t GetInputPacketType();
+        uint8_t GetDeviceAddress() { return device_address; }
+
         void SetSendDataFunction(std::function<void(GKV_PacketBase *)>ptrSendPacketFun);
         void SetReceivedPacketCallback(std::function<void(GKV_PacketBase *)> ptrReceivedPacketProcessingFun);
         void SetSettingsReceivedCallback(std::function<void(GKV_Settings *)> ptrReceivedPacketProcessingFun);
@@ -141,17 +151,34 @@ namespace Gyrovert
     private:
 
         void dataNewThreadReceiveFcn();
+        void dataNewThreadWriteFcn();
+
         void SendEmptyPacket(uint8_t type);
         void RecognisePacket(GKV_PacketBase* buf);
+
+
         std::function<void(GKV_PacketBase *)> GKV_PacketProcessingCallback = nullptr;
 
-
         std::thread Receiver;
+        //Data Logger Parameters
+        std::thread Logger;
+        char* buffer_1;
+        char* buffer_2;
+        uint32_t buffer_point_1 = 0;
+        uint32_t buffer_point_2 = 0;
+        uint8_t WritingMode = 0;
+        bool WriteBuffer1Flag = false;
+        bool WriteBuffer2Flag = false;
+        std::string filePath;
+        std::ofstream outfile;
+
 
         uint8_t InputPacket[sizeof(GKV_PacketBase)] = { 0 };
         GKV_PacketBase* Output_Packet = new GKV_PacketBase;
         GKV_PacketBase* CurrentReceivedPacket = new GKV_PacketBase;
         uint32_t CTR = 0;
+        uint8_t device_address = 0x00;
+
         std::function<void(GKV_PacketBase *)>ptrSendFun = nullptr;
         std::function<void(GKV_Settings *)> ptrSettingsPacketCallback=nullptr;
         std::function<void(GKV_CustomDataParam *)> ptrCustomPacketParamCallback = nullptr;
@@ -174,6 +201,7 @@ namespace Gyrovert
         bool CustomPacketParamRequestedFlag = false;
         bool DataRequestedFlag = false;
         bool gkv_open = true;
+        bool DataWritingEnabled = false;
 
         struct __DeviceState
         {

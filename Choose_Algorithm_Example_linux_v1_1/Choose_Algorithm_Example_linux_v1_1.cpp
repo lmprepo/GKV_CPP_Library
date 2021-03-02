@@ -61,6 +61,8 @@ int main()
         GKV->SetDefaultAlgorithmPacket();
         GKV->SetAlgorithm(algorithm);
     }
+    GKV->RequestDeviceID();
+
     while (1)
     {
         //do something
@@ -292,6 +294,11 @@ void RecognisePacket(GKV_PacketBase* buf)
                 }
             }
             cout << endl;
+            break;
+        }
+        case GKV_DEV_ID_PACKET:
+        {
+            cout << "ID Packet: " << endl;
             break;
         }
         //Примечание: в данном примере вывод значений некоторых параметров наборного пакета с пометкой int будет некорректен, поскольку данная программа
