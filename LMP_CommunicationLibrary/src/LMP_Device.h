@@ -43,7 +43,6 @@
 #include <stdio.h>
 #include <functional>
 #include <thread>
-#include <filesystem>
 
 #ifdef __linux
 #include <pthread.h>
