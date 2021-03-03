@@ -19,12 +19,12 @@ int main()
     /* Create GKV Device Object GKV */
     GKV_Device* GKV = new GKV_Device(com_port, B921600);
     if (!(GKV->GetSerialConnectionState())) return 0;
+    /* Show current folder */
+    cout << "Writing data to " << GetCurrentPath() << endl;
     /* GKV Settings */
     GKV->RunDevice();//Run Thread For Receiving Data From GKV
     GKV->StartWriteBinaryData();
     cout << "#start main loop\n";
-    cout << "Writing data to " << GetCurrentPath() << endl;    /* Show data writing path */
-
     while (1)
     {
         //do something

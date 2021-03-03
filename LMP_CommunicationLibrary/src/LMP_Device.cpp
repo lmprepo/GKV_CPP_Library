@@ -648,6 +648,7 @@ namespace Gyrovert
             {
                 ptrRawDataPacketCallback(&data);
             }
+            break;
         }
         case GKV_EULER_ANGLES_PACKET:
         {
