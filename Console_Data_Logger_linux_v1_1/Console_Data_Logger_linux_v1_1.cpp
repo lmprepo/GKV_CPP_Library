@@ -3,8 +3,12 @@
 #include <iostream>
 #include <stdio.h>
 #include "GKV_Device.h"
+#include <unistd.h>
+
 using namespace Gyrovert;
 using namespace std;
+
+string GetCurrentPath();
 
 int main()
 {
@@ -19,12 +23,21 @@ int main()
     GKV->RunDevice();//Run Thread For Receiving Data From GKV
     GKV->StartWriteBinaryData();
     cout << "#start main loop\n";
+    cout << "Writing data to " << GetCurrentPath() << endl;    /* Show data writing path */
+
     while (1)
     {
         //do something
     }
     GKV->StopWriteBinaryData();
     return 0;
+}
+
+string GetCurrentPath() {
+    char buff[FILENAME_MAX];
+    getcwd(buff, FILENAME_MAX);
+    string current_working_dir(buff);
+    return current_working_dir;
 }
 
 #else

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "GKV_Device.h"
+#include <filesystem>
 using namespace Gyrovert;
 using namespace std;
 
@@ -20,6 +21,8 @@ int main()
     GKV->RunDevice();//Run Thread For Receiving Data From GKV
     GKV->StartWriteBinaryData();
     cout << "#start main loop\n";
+    cout << "Writing data to " << std::filesystem::current_path() << '\n';    /* Show data writing path */
+
     while (1)
     {
         //do something
