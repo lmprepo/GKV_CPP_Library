@@ -19,14 +19,24 @@ void StopWriteBinaryData(); - останавливает запись данны
 
 void SetAlgorithm(uint8_t algorithm_register_value); - устанавливает на устройстве алгоритм обработки данных. Принимает следующие входные значения:
 
- - GKV_ADC_CODES_ALGORITHM 							          0x00
- - GKV_SENSORS_DATA_ALGORITHM 						        0x01
- - GKV_ORIENTATION_KALMAN_ALGORITHM 			        0x02
- - GKV_INCLINOMETER_ALGORITHM 					    	    0x04
- - GKV_ORIENTATION_MAHONY_ALGORITHM 			        0x05
- - GKV_BINS_NAVIGATON_ALGORITHM 				    	    0x06
- - GKV_CUSTOM_ALGORITHM 								          0x07
- - GKV_KALMAN_GNSS_NAVIGATON_ALGORITHM 	          0x08
- - GKV_ESKF5_NAVIGATON_ALGORITHM 	                0x09
+ - GKV_ADC_CODES_ALGORITHM = 0x00
+ - GKV_SENSORS_DATA_ALGORITHM = 0x01
+ - GKV_ORIENTATION_KALMAN_ALGORITHM = 0x02
+ - GKV_INCLINOMETER_ALGORITHM = 0x04
+ - GKV_ORIENTATION_MAHONY_ALGORITHM = 0x05
+ - GKV_BINS_NAVIGATON_ALGORITHM = 0x06
+ - GKV_CUSTOM_ALGORITHM = 0x07
+ - GKV_KALMAN_GNSS_NAVIGATON_ALGORITHM = 0x08
+ - GKV_ESKF5_NAVIGATON_ALGORITHM = 0x09
+ 
+void SetBaudrate(uint8_t baudrate_register_value); - устанавливает на устройстве битрейт основного интерфейса. Принимает следующие входные значения:
+
+ - GKV_BAUDRATE_921600 = 0x00
+ - GKV_BAUDRATE_460800 = 0x01
+ - GKV_BAUDRATE_230400 = 0x02
+ - GKV_BAUDRATE_115200 = 0x03
+ - GKV_BAUDRATE_1000000 = 0x04
+ - GKV_BAUDRATE_2000000 = 0x05
+ - GKV_BAUDRATE_3000000 = 0x06
 
 
