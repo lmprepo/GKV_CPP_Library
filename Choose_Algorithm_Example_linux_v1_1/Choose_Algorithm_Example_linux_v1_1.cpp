@@ -276,6 +276,29 @@ void RecognisePacket(GKV_PacketBase* buf)
             cout << "VDOP = " << str << endl;
             break;
         }
+        case GKV_EXTENDED_GNSS_PACKET:
+        {
+            GKV_GpsDataExt* packet;
+            packet = (GKV_GpsDataExt*)&buf->data;
+            cout << "Extended GNSS Data Packet: ";
+            sprintf(str, "%f", packet->vlat);
+            cout << "vlat = " << str << ' ';
+            sprintf(str, "%f", packet->vlon);
+            cout << "vlon = " << str << ' ';
+            sprintf(str, "%f", packet->sig_lat);
+            cout << "sig_lat = " << str << ' ';
+            sprintf(str, "%f", packet->sig_lon);
+            cout << "sig_lon = " << str << ' ';
+            sprintf(str, "%f", packet->sig_alt);
+            cout << "sig_alt = " << str << ' ';
+            sprintf(str, "%f", packet->sig_vlat);
+            cout << "sig_vlat = " << str << ' ';
+            sprintf(str, "%f", packet->sig_vlon);
+            cout << "sig_vlon = " << str << ' ';
+            sprintf(str, "%f", packet->sig_valt);
+            cout << "sig_valt = " << str << endl;
+            break;
+        }
         case GKV_CUSTOM_PACKET:
         {
             GKV_CustomData* packet;
