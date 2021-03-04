@@ -281,7 +281,7 @@ void RecognisePacket(GKV_PacketBase* buf)
             GKV_GpsDataExt* packet;
             packet = (GKV_GpsDataExt*)&buf->data;
             cout << "Extended GNSS Data Packet: ";
-            sprintf(str, "%f", packet->vlat);
+            sprintf(str, "%d", packet->vlat);
             cout << "vlat = " << str << ' ';
             sprintf(str, "%f", packet->vlon);
             cout << "vlon = " << str << ' ';

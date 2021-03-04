@@ -212,7 +212,7 @@ void RecognisePacket(GKV_PacketBase* buf)
             GKV_GpsData* packet;
             packet = (GKV_GpsData*)&buf->data;
             cout << "GNSS Data Packet: ";
-            sprintf(str, "%f", packet->time);
+            sprintf(str, "%d", packet->time);
             cout << "time = " << str << ' ';
             sprintf(str, "%f", packet->latitude);
             cout << "latitude = " << str << ' ';
