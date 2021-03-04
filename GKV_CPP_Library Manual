@@ -1,0 +1,32 @@
+Библиотека состоит из двух классов: 
+
+Класс LMP_Device содержит базовую логику обработки пакетов протокола информационного обмена ГКВ. 
+
+Класс GKV_Device наследует LMP_Device и представляет собой описание работы с serial-интерфейсом для Linux и Windows с использованием стандартных библиотек.
+
+-----------------------------------------
+public-методы класса LMP_Device:
+-----------------------------------------
+
+void RunDevice(); - запускает работу приема данных с модуля в отдельном потоке.
+
+uint8_t Receive_Process(); - запускает работу приема данных с модуля в текущем потоке. 
+Возвращает состояние приема пакета, возвращает 0, если в приемном буфере нет преамбулы, 1 - если в приемном буфере была обнаружена преамбула, но не сошлась контрольная сумма, 2 - если принят корректный пакет.
+
+void StartWriteBinaryData(); - запускает запись принимаемых данных в бинарный файл Log_Data_{дата-время начала записи} в отдельном потоке. Запись идет порциями по 34 кБ.
+
+void StopWriteBinaryData(); - останавливает запись данных в бинарный файл
+
+void SetAlgorithm(uint8_t algorithm_register_value); - устанавливает на устройстве алгоритм обработки данных. Принимает следующие входные значения:
+
+ - GKV_ADC_CODES_ALGORITHM 							          0x00
+ - GKV_SENSORS_DATA_ALGORITHM 						        0x01
+ - GKV_ORIENTATION_KALMAN_ALGORITHM 			        0x02
+ - GKV_INCLINOMETER_ALGORITHM 					    	    0x04
+ - GKV_ORIENTATION_MAHONY_ALGORITHM 			        0x05
+ - GKV_BINS_NAVIGATON_ALGORITHM 				    	    0x06
+ - GKV_CUSTOM_ALGORITHM 								          0x07
+ - GKV_KALMAN_GNSS_NAVIGATON_ALGORITHM 	          0x08
+ - GKV_ESKF5_NAVIGATON_ALGORITHM 	                0x09
+
+
