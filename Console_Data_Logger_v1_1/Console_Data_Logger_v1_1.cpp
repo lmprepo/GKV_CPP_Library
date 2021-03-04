@@ -7,7 +7,6 @@
 using namespace Gyrovert;
 using namespace std;
 
-
 int main()
 {
     string com_port;
@@ -18,12 +17,11 @@ int main()
     GKV_Device* GKV = new GKV_Device(com_port, 921600);
     if (!(GKV->GetSerialConnectionState())) return 0;
     /* Show current folder */
-    cout << "Writing data to " << std::filesystem::current_path() << '\n';    
+    cout << "Writing data to " << std::filesystem::current_path() << '\n';
     /* GKV Settings */
-    GKV->RunDevice();//Run Thread For Receiving Data From GKV
+    GKV->RunDevice(); /* Run Thread For Receiving Data From GKV */
     GKV->StartWriteBinaryData();
     cout << "#start main loop\n";
-
 
     while (1)
     {

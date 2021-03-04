@@ -481,6 +481,29 @@ namespace Gyrovert
       */
     uint8_t LMP_Device::put(uint8_t b)//???????? ?? ?????????
     {
+        if (DataWritingEnabled)
+        {
+            if (WritingMode == 0)
+            {
+                buffer_1[buffer_point_1] = b;
+                buffer_point_1++;
+                if (buffer_point_1 > (100000 - 0xFFFF))
+                {
+                    WritingMode = 1;
+                    WriteBuffer1Flag = true;
+                }
+            }
+            else
+            {
+                buffer_2[buffer_point_2] = b;
+                buffer_point_2++;
+                if (buffer_point_2 > (100000 - 0xFFFF))
+                {
+                    WritingMode = 0;
+                    WriteBuffer2Flag = true;
+                }
+            }
+        }
         if (CTR == 0)
         {
             if (b != 0xFF)
@@ -488,7 +511,6 @@ namespace Gyrovert
                 return 0;
             }
         }
-
         *((uint8_t*)(&InputPacket) + CTR) = b;
         CTR++;
         return 1;
@@ -744,29 +766,29 @@ namespace Gyrovert
             break;
         }
         }
-        if (DataWritingEnabled)
-        {
-            if (WritingMode == 0)
-            {
-                memcpy(&(buffer_1[buffer_point_1]), buf, ((buf->length) + 8));
-                buffer_point_1 += ((buf->length) + 8);
-                if (buffer_point_1 > (100000 - 0xFFFF))
-                {
-                    WritingMode = 1;
-                    WriteBuffer1Flag = true;
-                }
-            }
-            else
-            {
-                memcpy(&(buffer_2[buffer_point_2]), buf, ((buf->length) + 8));
-                buffer_point_2 += ((buf->length) + 8);
-                if (buffer_point_2 > (100000 - 0xFFFF))
-                {
-                    WritingMode = 0;
-                    WriteBuffer2Flag = true;
-                }
-            }
-        }
+        //if (DataWritingEnabled)
+        //{
+        //    if (WritingMode == 0)
+        //    {
+        //        memcpy(&(buffer_1[buffer_point_1]), buf, ((buf->length) + 8));
+        //        buffer_point_1 += ((buf->length) + 8);
+        //        if (buffer_point_1 > (100000 - 0xFFFF))
+        //        {
+        //            WritingMode = 1;
+        //            WriteBuffer1Flag = true;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        memcpy(&(buffer_2[buffer_point_2]), buf, ((buf->length) + 8));
+        //        buffer_point_2 += ((buf->length) + 8);
+        //        if (buffer_point_2 > (100000 - 0xFFFF))
+        //        {
+        //            WritingMode = 0;
+        //            WriteBuffer2Flag = true;
+        //        }
+        //    }
+        //}
     }
 
     /**
