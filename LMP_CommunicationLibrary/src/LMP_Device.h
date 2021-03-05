@@ -96,22 +96,17 @@ namespace Gyrovert
     {
     public:
         LMP_Device();
-        LMP_Device(void(*ptrSendPacketFun)(GKV_PacketBase* Output_Packet_Ptr));
+        //LMP_Device(void(*ptrSendPacketFun)(GKV_PacketBase* Output_Packet_Ptr));
         ~LMP_Device();
         void RunDevice();
+        uint8_t Receive_Process();
+
         void StartWriteBinaryData();
         void StopWriteBinaryData(){ DataWritingEnabled = false; }
 
         void Send_Data();
         void Configure_Output_Packet(uint8_t type, void* data_ptr, uint8_t size);
         uint32_t crc32_compute(const void* buf, unsigned long size);
-
-        uint8_t Receive_Process();
-        uint8_t parseCycle();
-        uint8_t parse();
-        uint8_t refind_preamble(int start);
-        uint8_t check(GKV_PacketBase* pack);
-        uint8_t put(uint8_t b);
 
         void SetAlgorithm(uint8_t algorithm_register_value);
         void SetBaudrate(uint8_t baudrate_register_value);
@@ -148,6 +143,12 @@ namespace Gyrovert
         void clear() { CTR = 0; }
 
     private:
+
+        uint8_t parseCycle();
+        uint8_t parse();
+        uint8_t refind_preamble(int start);
+        uint8_t check(GKV_PacketBase* pack);
+        uint8_t put(uint8_t b);
 
         void dataNewThreadReceiveFcn();
         void dataNewThreadWriteFcn();
