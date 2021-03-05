@@ -48,7 +48,6 @@ void SetCustomPacketParam(uint8_t* param_array_ptr, uint8_t quantity_of_params);
 
 ВНИМАНИЕ: функция не имеет защиты от записи некорректных параметров наборного пакета!
 
-
 void SetSettingsReceivedCallback(std::function<void(GKV_Settings *)> ptrReceivedPacketProcessingFun); - задает пользовательскую функцию, которая будет являться коллбэком на каждый из принятых пакетов.
 
 ВНИМАНИЕ: При работе цикла приема данных в отдельном потоке, данный коллбэк также будет исполняться в этом потоке и при большом времени работы может повлиять на прием данных. 
