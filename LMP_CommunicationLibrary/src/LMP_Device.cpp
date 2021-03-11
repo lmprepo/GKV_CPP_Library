@@ -60,6 +60,8 @@ namespace Gyrovert
         delete[] buffer_1;
         delete[] buffer_2;
         gkv_open = false;
+        Receiver.join();
+        Logger.join();
     }
 
     /**
@@ -852,10 +854,8 @@ namespace Gyrovert
     void LMP_Device::RunDevice()
     {
         //Receive_Process();
-        std::thread Receiver(&LMP_Device::dataNewThreadReceiveFcn, this);
-        std::thread Logger(&LMP_Device::dataNewThreadWriteFcn, this);
-        Receiver.detach();
-        Logger.detach();
+        Receiver = std::move(std::thread(&LMP_Device::dataNewThreadReceiveFcn, this));
+        Logger = std::move(std::thread(&LMP_Device::dataNewThreadWriteFcn, this));
         RequestSettings();
         RequestDeviceID();
         RequestCustomPacketParams();
