@@ -59,6 +59,16 @@ namespace Gyrovert
 #include "LMP_AlgParamPacket.h"
 #include "LMP_GyroOffsetPacket.h"
 
+//ACCELERATION UNITS
+#define GKV_MS2 1
+#define GKV_G 0
+//ANGULAR RATE UNITS
+#define GKV_DEGREES_PER_SECOND 1
+#define GKV_RADIANS_PER_SECOND 0
+//ANGLE UNITS
+#define GKV_DEGREES 1
+#define GKV_RADIANS 0
+
     const uint32_t crc32_tabl[] =
     {
         0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
@@ -113,6 +123,10 @@ namespace Gyrovert
         void SetDefaultAlgorithmPacket();
         void SetCustomAlgorithmPacket();
         void SetCustomPacketParam(uint8_t* param_array_ptr, uint8_t quantity_of_params);
+
+        void SetAccelerationUnits(uint8_t units);
+        void SetAngularRateUnits(uint8_t units);
+        void SetAngleUnits(uint8_t units);
 
         virtual void WriteDataToGKV(GKV_PacketBase* data) {};
         virtual char ReadDataFromGKV() { return 0; };
