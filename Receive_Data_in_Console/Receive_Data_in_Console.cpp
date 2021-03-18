@@ -9,7 +9,7 @@ using namespace std;
 HANDLE hSerial;
 
 bool InitSerialPort(string port_name, int32_t baudrate);
-char ReadCOM();
+char* ReadCOM();
 void WriteCOM(GKV_PacketBase* buf);
 void RecognisePacket(GKV_PacketBase* buf);
 
@@ -78,7 +78,7 @@ void WriteCOM(GKV_PacketBase* buf)
     Sleep(1);
 }
 
-char ReadCOM()
+char* ReadCOM()
 {
     DWORD iSize;
     char sReceivedChar = 0;
@@ -87,7 +87,7 @@ char ReadCOM()
     {
         iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
         if (iSize > 0)
-            return sReceivedChar;
+            return &sReceivedChar;
     }
     return 0;
 }

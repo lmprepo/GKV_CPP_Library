@@ -40,6 +40,7 @@
 #define GKV_DEVICE_H
 
 #include <LMP_Device.h>
+#include <vector>
 namespace Gyrovert
 {
 #define GKV_SELECT_DEFAULT_ALGORITHM_PACKET 0
@@ -94,7 +95,26 @@ namespace Gyrovert
                 Sleep(1);
             }
         }
-        char ReadDataFromGKV() override
+
+        //char ReadDataFromGKV() override
+        //{
+        //    if (SerialInitialized)
+        //    {
+        //        DWORD iSize;
+        //        char sReceivedChar;
+        //        char iRet = 0;
+        //        while (true)
+        //        {
+        //            iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
+        //            if (iSize > 0)
+        //                return sReceivedChar;
+        //        }
+        //    }
+        //    return 0;
+        //}
+
+
+        char* ReadDataFromGKV() override
         {
             if (SerialInitialized)
             {
@@ -103,18 +123,49 @@ namespace Gyrovert
                 char iRet = 0;
                 while (true)
                 {
-                    iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
+                    iRet = ReadFile(hSerial, &inBuffer, 128, &iSize, 0);
                     if (iSize > 0)
-                        return sReceivedChar;
+                    {
+                        SetReceivedDataSize(iSize);
+                        return inBuffer;
+                    }
                 }
             }
             return 0;
         }
+
+        //std::vector<char> ReadDataFromGKV() override
+        //{
+
+        //    if (SerialInitialized)
+        //    {
+        //        DWORD iSize;
+        //        char sReceivedChar[2048];
+        //        std::vector<char> RetData;
+        //        char iRet = 0;
+        //        while (true)
+        //        {
+        //            iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
+        //            if (iSize > 0)
+        //            {
+        //                for (uint16_t i = 0; i < iSize; i++)
+        //                {
+        //                    RetData.push_back(sReceivedChar[i]);
+        //                }
+
+        //            }
+        //            return RetData;
+        //        }
+        //    }
+        //    return (std::vector<char>)0;
+        //}
+
         bool GetSerialConnectionState()
         {
             return SerialInitialized;
         }
     private:
+        char inBuffer[128] = { 0 };
         bool SerialInitialized = false;
     };
 #else

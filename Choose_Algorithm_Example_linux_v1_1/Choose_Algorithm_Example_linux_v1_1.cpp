@@ -2,6 +2,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "GKV_Device.h"
+
 using namespace Gyrovert;
 using namespace std;
 

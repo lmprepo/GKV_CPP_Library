@@ -97,8 +97,7 @@ namespace Gyrovert
       * @param  ptrRecPacketFun - pointer on char-type callback function that returns received byte from serial port
       * @retval no return value.
       */
-    void  LMP_Device::SetReceiveDataFunction(std::function<char()>ptrRecPacketFun)
-
+    void  LMP_Device::SetReceiveDataFunction(std::function<char*()>ptrRecPacketFun)
     {
         ptrRecFcn = ptrRecPacketFun;
     }
@@ -600,9 +599,28 @@ namespace Gyrovert
       * @brief  Main function of received data processing. It can be inserted into main cycle and calls when byte received. function forms packet with received bytes and runs callback fucntion when it formed.
       * @retval function returns result of searching correct packet. 0x00 - not enough bytes received, 0x01 - checksum is incorrect, 0x02 - packet checked
       */
+    //uint8_t LMP_Device::Receive_Process()
+    //{
+    //    char buffer_byte = 0;
+    //    if (ptrRecFcn)
+    //    {
+    //        buffer_byte = ptrRecFcn();
+    //    }
+    //    else
+    //    {
+    //        buffer_byte = ReadDataFromGKV();
+    //    }
+    //    if (put(buffer_byte))
+    //    {
+    //        return parseCycle();
+    //    }
+    //    return 0;
+    //}
+
     uint8_t LMP_Device::Receive_Process()
     {
-        char buffer_byte = 0;
+        uint8_t result = 0;
+        char* buffer_byte = 0;
         if (ptrRecFcn)
         {
             buffer_byte = ptrRecFcn();
@@ -611,14 +629,15 @@ namespace Gyrovert
         {
             buffer_byte = ReadDataFromGKV();
         }
-        if (put(buffer_byte))
+        for (uint16_t i = 0; i < ReceivedDataSize; i++)
         {
-            return parseCycle();
+            if (put(*(buffer_byte + i)))
+            {
+                result = parseCycle();
+            }
         }
-        return 0;
+        return result;
     }
-
-
 
 
     /**

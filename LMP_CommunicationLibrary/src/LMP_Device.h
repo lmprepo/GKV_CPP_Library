@@ -129,7 +129,7 @@ namespace Gyrovert
         void SetAngleUnits(uint8_t units);
 
         virtual void WriteDataToGKV(GKV_PacketBase* data) {};
-        virtual char ReadDataFromGKV() { return 0; };
+        virtual char* ReadDataFromGKV() { return 0; };
 
         void CheckConnection();
         void RequestDeviceID();
@@ -153,9 +153,10 @@ namespace Gyrovert
         void SetBINSDataReceivedCallback(std::function<void(GKV_BINSData *)> ptrReceivedPacketProcessingFun);
         void SetGNSSDataReceivedCallback(std::function<void(GKV_GpsData *)>ptrReceivedPacketProcessingFun);
         void SetExtGNSSDataReceivedCallback(std::function<void(GKV_GpsDataExt *)>ptrReceivedPacketProcessingFun);
-        void SetReceiveDataFunction(std::function<char()>ptrRecPacketFun);
+        void SetReceiveDataFunction(std::function<char *()>ptrRecPacketFun);
         void clear() { CTR = 0; }
 
+        void SetReceivedDataSize(uint16_t size) { if (size > 0) ReceivedDataSize = size; else ReceivedDataSize = 1; }
     private:
 
         uint8_t parseCycle();
@@ -169,7 +170,6 @@ namespace Gyrovert
 
         void SendEmptyPacket(uint8_t type);
         void RecognisePacket(GKV_PacketBase* buf);
-
 
         std::function<void(GKV_PacketBase *)> GKV_PacketProcessingCallback = nullptr;
 
@@ -185,7 +185,6 @@ namespace Gyrovert
         bool WriteBuffer2Flag = false;
         std::string filePath;
         std::ofstream outfile;
-
 
         uint8_t InputPacket[sizeof(GKV_PacketBase)] = { 0 };
         GKV_PacketBase* Output_Packet = new GKV_PacketBase;
@@ -224,7 +223,7 @@ namespace Gyrovert
             GKV_CustomDataParam CurrentCustomPacketParameters;
         }DeviceState;
 
-        std::function<char()>ptrRecFcn = nullptr;
+        std::function<char *()>ptrRecFcn = nullptr;
         enum EStatus
         {
             NOT_ENOUGH,
@@ -232,6 +231,7 @@ namespace Gyrovert
             CHECK_OK,
         };
 
+        uint16_t ReceivedDataSize = 1;
     };
 }
 #endif

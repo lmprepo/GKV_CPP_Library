@@ -11,7 +11,7 @@ HANDLE hSerial;
 uint8_t algorithm_selected = 0;
 
 bool InitSerialPort(string port_name, int32_t baudrate);
-char ReadCOM();
+char* ReadCOM();
 void WriteCOM(GKV_PacketBase* buf);
 void ShowPacketData(GKV_ADCData* buf);
 
@@ -85,7 +85,7 @@ void WriteCOM(GKV_PacketBase* buf)
     Sleep(1);
 }
 
-char ReadCOM()
+char* ReadCOM()
 {
     DWORD iSize;
     char sReceivedChar;
@@ -94,7 +94,7 @@ char ReadCOM()
     {
         iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
         if (iSize > 0)
-            return sReceivedChar;
+            return &sReceivedChar;
     }
     return 0;
 }

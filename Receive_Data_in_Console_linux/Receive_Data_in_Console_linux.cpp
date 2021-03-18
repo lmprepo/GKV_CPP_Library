@@ -12,7 +12,7 @@ using namespace std;
 int SerialPortHandle;
 
 bool InitSerialPort(string port_name, int32_t baudrate);
-char ReadCOM();
+char* ReadCOM();
 void WriteCOM(GKV_PacketBase* buf);
 void RecognisePacket(GKV_PacketBase* buf);
 
@@ -89,13 +89,13 @@ void WriteCOM(GKV_PacketBase* buf)
     usleep(1000);
 }
 
-char ReadCOM()
+char* ReadCOM()
 {
     char sReceivedChar;
     while (true)
     {
         int iOut = read(SerialPortHandle, &sReceivedChar, 1);
-        return sReceivedChar;
+        return &sReceivedChar;
     }
     return 0;
 }
