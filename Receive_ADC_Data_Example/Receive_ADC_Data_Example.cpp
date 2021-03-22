@@ -8,6 +8,7 @@ using namespace Gyrovert;
 using namespace std;
 
 HANDLE hSerial;
+char ReceivedData=0;
 uint8_t algorithm_selected = 0;
 
 bool InitSerialPort(string port_name, int32_t baudrate);
@@ -88,13 +89,12 @@ void WriteCOM(GKV_PacketBase* buf)
 char* ReadCOM()
 {
     DWORD iSize;
-    char sReceivedChar;
     char iRet = 0;
     while (true)
     {
-        iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
+        iRet = ReadFile(hSerial, &ReceivedData, sizeof(ReceivedData), &iSize, 0);
         if (iSize > 0)
-            return &sReceivedChar;
+            return &ReceivedData;
     }
     return 0;
 }

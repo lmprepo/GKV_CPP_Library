@@ -11,6 +11,7 @@ using namespace std;
 
 int SerialPortHandle;
 uint8_t algorithm_selected = 0;
+char ReceivedData=0;
 
 bool InitSerialPort(string port_name, int32_t baudrate);
 char* ReadCOM();
@@ -97,8 +98,8 @@ char* ReadCOM()
     char sReceivedChar;
     while (true)
     {
-        int iOut = read(SerialPortHandle, &sReceivedChar, 1);
-        return &sReceivedChar;
+        int iOut = read(SerialPortHandle, &ReceivedData, 1);
+        return &ReceivedData;
     }
     return 0;
 }
