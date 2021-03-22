@@ -123,10 +123,10 @@ namespace Gyrovert
                 char iRet = 0;
                 while (true)
                 {
-                    iRet = ReadFile(hSerial, &inBuffer, 128, &iSize, 0);
+                    iRet = ReadFile(hSerial, &inBuffer, 2048, &iSize, 0);
                     if (iSize > 0)
                     {
-                        SetReceivedDataSize(iSize);
+                        SetReceiveBufferSize(iSize);
                         return inBuffer;
                     }
                 }
@@ -165,7 +165,7 @@ namespace Gyrovert
             return SerialInitialized;
         }
     private:
-        char inBuffer[128] = { 0 };
+        char inBuffer[2048] = { 0 };
         bool SerialInitialized = false;
     };
 #else
@@ -231,15 +231,17 @@ namespace Gyrovert
                 usleep(1000);
             }
         }
-        char ReadDataFromGKV() override
+        char* ReadDataFromGKV() override
         {
             if (SerialInitialized)
             {
+                int iOut;
                 char sReceivedChar;
                 while (true)
                 {
-                    int iOut = read(SerialPortHandle, &sReceivedChar, 1);
-                    return sReceivedChar;
+                    iOut = read(SerialPortHandle, &inBuffer, 2048);
+                    SetReceiveBufferSize(iOut);
+                    return inBuffer;
                 }
             }
             return 0;
@@ -249,6 +251,7 @@ namespace Gyrovert
             return SerialInitialized;
         }
     private:
+        char inBuffer[2048] = { 0 };
         bool SerialInitialized = false;
 };
 #endif // __linux

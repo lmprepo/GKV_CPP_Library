@@ -156,7 +156,9 @@ namespace Gyrovert
         void SetReceiveDataFunction(std::function<char *()>ptrRecPacketFun);
         void clear() { CTR = 0; }
 
-        void SetReceivedDataSize(uint16_t size) { if (size > 0) ReceivedDataSize = size; else ReceivedDataSize = 1; }
+        void SetReceiveBufferSize(uint16_t size) { if (size > 0) ReceivedDataSize = size; else ReceivedDataSize = 1; }
+        uint16_t GetReceiveBufferSize() { return ReceivedDataSize;}
+
     private:
 
         uint8_t parseCycle();

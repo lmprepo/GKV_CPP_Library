@@ -620,7 +620,7 @@ namespace Gyrovert
     uint8_t LMP_Device::Receive_Process()
     {
         uint8_t result = 0;
-        char* buffer_byte = 0;
+        char* buffer_byte = NULL;
         if (ptrRecFcn)
         {
             buffer_byte = ptrRecFcn();
@@ -629,13 +629,16 @@ namespace Gyrovert
         {
             buffer_byte = ReadDataFromGKV();
         }
-        for (uint16_t i = 0; i < ReceivedDataSize; i++)
-        {
-            if (put(*(buffer_byte + i)))
+        //if (!(buffer_byte == NULL))
+        //{
+            for (uint16_t i = 0; i < ReceivedDataSize; i++)
             {
-                result = parseCycle();
+                if (put(*(buffer_byte + i)))
+                {
+                    result = parseCycle();
+                }
             }
-        }
+        /*}*/
         return result;
     }
 
