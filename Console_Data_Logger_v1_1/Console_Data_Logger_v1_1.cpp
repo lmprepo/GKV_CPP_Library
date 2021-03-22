@@ -2,10 +2,14 @@
 #include <string>
 #include <iostream>
 #include <stdio.h>
+#include <direct.h>
 #include "GKV_Device.h"
-#include <filesystem>
 using namespace Gyrovert;
 using namespace std;
+
+
+string GetCurrentPath();
+
 
 int main()
 {
@@ -17,7 +21,7 @@ int main()
     GKV_Device* GKV = new GKV_Device(com_port, 921600);
     if (!(GKV->GetSerialConnectionState())) return 0;
     /* Show current folder */
-    cout << "Writing data to " << std::filesystem::current_path() << '\n';
+    cout << "Writing data to " << GetCurrentPath() << '\n';
     /* GKV Settings */
     GKV->RunDevice(); /* Run Thread For Receiving Data From GKV */
     GKV->StartWriteBinaryData();
@@ -31,6 +35,12 @@ int main()
     return 0;
 }
 
+string GetCurrentPath() {
+    char buff[FILENAME_MAX];
+    _getcwd(buff, FILENAME_MAX);
+    string current_working_dir(buff);
+    return current_working_dir;
+}
 #else
 int main()
 {
