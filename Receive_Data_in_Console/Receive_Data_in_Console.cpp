@@ -24,6 +24,7 @@ int main()
     /* Create LMP Device Object GKV */
     LMP_Device* GKV = new LMP_Device();
     /* Serial Port Settings For Windows */
+    com_port = "\\\\.\\" + com_port;
     if (!(InitSerialPort(com_port, 921600))) return 1;
     /* GKV Settings */
     GKV->SetReceivedPacketCallback(RecognisePacket);//Set User Callback for Each Parsed GKV Packet

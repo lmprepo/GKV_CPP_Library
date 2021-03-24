@@ -60,7 +60,8 @@ namespace Gyrovert
 
         bool InitSerialPort(std::string port_name, uint32_t baudrate)
         {
-            hSerial = CreateFileA(port_name.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+            port_name = "\\\\.\\" + port_name;
+            hSerial = CreateFileA( port_name.c_str(), GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
             if (hSerial == INVALID_HANDLE_VALUE)
             {
                 if (GetLastError() == ERROR_FILE_NOT_FOUND)
