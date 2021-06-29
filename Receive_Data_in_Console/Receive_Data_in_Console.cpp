@@ -12,7 +12,7 @@ char ReceivedData=0;
 bool InitSerialPort(string port_name, int32_t baudrate);
 char* ReadCOM();
 void WriteCOM(GKV_PacketBase* buf);
-void RecognisePacket(GKV_PacketBase* buf);
+void RecognisePacket(LMP_Device * GKV,GKV_PacketBase* buf);
 
 int main()
 {
@@ -93,7 +93,7 @@ char* ReadCOM()
     return 0;
 }
 
-void RecognisePacket(GKV_PacketBase* buf)
+void RecognisePacket(LMP_Device *GKV, GKV_PacketBase* buf)
 {
     char str[30];
     switch (buf->type)
@@ -253,14 +253,37 @@ void RecognisePacket(GKV_PacketBase* buf)
         cout << "CustomPacket: ";
         for (uint8_t i = 0; i < ((buf->length) / 4); i++)
         {
-            if (packet->parameter[i] == packet->parameter[i])// проверка на isnan
+            if (GKV->IsCustomPacketParamReceived())//if custom parameters list received
             {
-                sprintf(str, "%f", (packet->parameter[i]));
-                cout << "param = " << str << ' ';
-            }
-            else
-            {
-                cout << "param = NaN ";
+                uint8_t CurrentParameterType = FloatParameter;
+                for (uint8_t j = 0; j < sizeof(GKV->INT_PARAM_NUMBERS); j++)
+                {
+                    if (GKV->DeviceState.CurrentCustomPacketParameters.param[i] == GKV->INT_PARAM_NUMBERS[j])
+                    {
+                        CurrentParameterType = Int32Parameter;
+                        break;
+                    }
+                }
+                for (uint8_t j = 0; j < sizeof(GKV->UINT_PARAM_NUMBERS); j++)
+                {
+                    if (GKV->DeviceState.CurrentCustomPacketParameters.param[i] == GKV->UINT_PARAM_NUMBERS[j])
+                    {
+                        CurrentParameterType = Uint32Parameter;
+                        break;
+                    }
+                }
+                if (CurrentParameterType == FloatParameter)
+                {
+                    cout << "param = " << (packet->parameter[i]) << ' ';
+                }
+                else if (CurrentParameterType == Int32Parameter)
+                {
+                    cout << "param = " << *(int32_t*)&(packet->parameter[i]) << ' ';
+                }
+                else
+                {
+                    cout << "param = " << *(uint32_t*)&(packet->parameter[i]) << ' ';
+                }
             }
         }
         cout << endl;

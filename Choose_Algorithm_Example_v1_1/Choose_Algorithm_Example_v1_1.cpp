@@ -11,7 +11,7 @@ uint8_t algorithm = GKV_ADC_CODES_ALGORITHM;
 uint8_t algorithm_packet = 0;
 uint8_t algorithm_selected = 0;
 
-void RecognisePacket(GKV_PacketBase* buf);
+void RecognisePacket(LMP_Device * GKV,GKV_PacketBase* buf);
 uint8_t check_input(string str);
 uint8_t ChooseAlgorithmPacket(uint8_t algorithm);
 
@@ -59,7 +59,8 @@ int main()
     /* Set Selected Algorithm */
     while (!(algorithm_selected))
     {
-        GKV->SetDefaultAlgorithmPacket();
+        GKV->SetDefaultAlgorithmPacket(); //selection of standard packet for selected algorithm
+        //GKV->SetCustomAlgorithmPacket(); //selection of custom data processed using selected algorithm. Uncomment to select this packet type (with string in RecognisePacket function)
         GKV->SetAlgorithm(algorithm);
     }
     cout << "#start main loop\n";
@@ -145,7 +146,7 @@ uint8_t ChooseAlgorithmPacket(uint8_t algorithm)
     }
 }
 
-void RecognisePacket(GKV_PacketBase* buf)
+void RecognisePacket(LMP_Device* GKV, GKV_PacketBase* buf)
 {
     char str[30];
     if (algorithm_selected)
@@ -307,14 +308,37 @@ void RecognisePacket(GKV_PacketBase* buf)
             cout << "CustomPacket: ";
             for (uint8_t i = 0; i < ((buf->length) / 4); i++)
             {
-                if (packet->parameter[i] == packet->parameter[i])// проверка на isnan
+                if (GKV->IsCustomPacketParamReceived())//if custom parameters list received
                 {
-                    sprintf(str, "%f", (packet->parameter[i]));
-                    cout << "param = " << str << ' ';
-                }
-                else
-                {
-                    cout << "param = NaN ";
+                    uint8_t CurrentParameterType = FloatParameter;
+                    for (uint8_t j = 0; j < sizeof(GKV->INT_PARAM_NUMBERS); j++)
+                    {
+                        if (GKV->DeviceState.CurrentCustomPacketParameters.param[i] == GKV->INT_PARAM_NUMBERS[j])
+                        {
+                            CurrentParameterType = Int32Parameter;
+                            break;
+                        }
+                    }
+                    for (uint8_t j = 0; j < sizeof(GKV->UINT_PARAM_NUMBERS); j++)
+                    {
+                        if (GKV->DeviceState.CurrentCustomPacketParameters.param[i] == GKV->UINT_PARAM_NUMBERS[j])
+                        {
+                            CurrentParameterType = Uint32Parameter;
+                            break;
+                        }
+                    }
+                    if (CurrentParameterType == FloatParameter)
+                    {
+                        cout << "param = " << (packet->parameter[i]) << ' ';
+                    }
+                    else if (CurrentParameterType == Int32Parameter)
+                    {
+                        cout << "param = " << *(int32_t*)&(packet->parameter[i]) << ' ';
+                    }
+                    else
+                    {
+                        cout << "param = " << *(uint32_t*)&(packet->parameter[i]) << ' ';
+                    }
                 }
             }
             cout << endl;
@@ -325,13 +349,12 @@ void RecognisePacket(GKV_PacketBase* buf)
             cout << "ID Packet: "<<endl;
             break;
         }
-        //Примечание: в данном примере вывод значений некоторых параметров наборного пакета с пометкой int будет некорректен, поскольку данная программа
-        //не посылает запроса на получение номеров парамеров наборного пакета и выводит все параметры, как float.
         }
     }
     else
     {
-        if (buf->type == algorithm_packet) algorithm_selected = 1;
+        //if (buf->type == GKV_CUSTOM_PACKET)) algorithm_selected = 1;// check for custom  data stream. Uncomment to use this type (with custom packet selection in main)
+        if (buf->type == algorithm_packet) algorithm_selected = 1;// check for algorithm selection with default packet 
     }
 }
 #else

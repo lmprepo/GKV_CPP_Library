@@ -294,9 +294,12 @@ typedef struct __GKV_CustomDataParam
 	uint8_t param[63];                      /*	type of parameter N from list of 'custom_data_parameters'	*/
 }GKV_CustomDataParam;
 
-
-
-
+enum ParameterType
+{
+    FloatParameter,
+    Int32Parameter,
+    Uint32Parameter
+};
 /*----------------------------------------------------------------------------DATA_REQUEST-------------------------------------------------------------------------------------*/
 
 #ifndef  __GET_DATA_PACKET__

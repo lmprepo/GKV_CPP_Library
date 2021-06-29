@@ -137,28 +137,39 @@ namespace Gyrovert
         void RequestData();
         void RequestCustomPacketParams();
         void ResetDevice();
-
+        bool IsCustomPacketParamReceived() { return CustomPacketParamReceivedFlag; }
         uint8_t GetInputPacketType();
         uint8_t GetDeviceAddress() { return device_address; }
 
         void SetSendDataFunction(std::function<void(GKV_PacketBase *)>ptrSendPacketFun);
-        void SetReceivedPacketCallback(std::function<void(GKV_PacketBase *)> ptrReceivedPacketProcessingFun);
-        void SetSettingsReceivedCallback(std::function<void(GKV_Settings *)> ptrReceivedPacketProcessingFun);
-        void SetCustomPacketParamReceivedCallback(std::function<void(GKV_CustomDataParam *)> ptrReceivedPacketProcessingFun);
-        void SetCustomPacketReceivedCallback(std::function<void(GKV_CustomData *)>ptrReceivedPacketProcessingFun);
-        void SetADCDataReceivedCallback(std::function<void(GKV_ADCData *)> ptrReceivedPacketProcessingFun);
-        void SetRawDataReceivedCallback(std::function<void(GKV_RawData *)> ptrReceivedPacketProcessingFun);
-        void SetGyrovertDataReceivedCallback(std::function<void(GKV_GyrovertData *)> ptrReceivedPacketProcessingFun);
-        void SetInclinometerDataReceivedCallback(std::function<void(GKV_InclinometerData *)>ptrReceivedPacketProcessingFun);
-        void SetBINSDataReceivedCallback(std::function<void(GKV_BINSData *)> ptrReceivedPacketProcessingFun);
-        void SetGNSSDataReceivedCallback(std::function<void(GKV_GpsData *)>ptrReceivedPacketProcessingFun);
-        void SetExtGNSSDataReceivedCallback(std::function<void(GKV_GpsDataExt *)>ptrReceivedPacketProcessingFun);
+        void SetReceivedPacketCallback(std::function<void(LMP_Device *,GKV_PacketBase *)> ptrReceivedPacketProcessingFun);
+        void SetSettingsReceivedCallback(std::function<void(LMP_Device*, GKV_Settings *)> ptrReceivedPacketProcessingFun);
+        void SetCustomPacketParamReceivedCallback(std::function<void(LMP_Device*, GKV_CustomDataParam *)> ptrReceivedPacketProcessingFun);
+        void SetCustomPacketReceivedCallback(std::function<void(LMP_Device*, GKV_CustomData *)>ptrReceivedPacketProcessingFun);
+        void SetADCDataReceivedCallback(std::function<void(LMP_Device*, GKV_ADCData *)> ptrReceivedPacketProcessingFun);
+        void SetRawDataReceivedCallback(std::function<void(LMP_Device*, GKV_RawData *)> ptrReceivedPacketProcessingFun);
+        void SetGyrovertDataReceivedCallback(std::function<void(LMP_Device*, GKV_GyrovertData *)> ptrReceivedPacketProcessingFun);
+        void SetInclinometerDataReceivedCallback(std::function<void(LMP_Device*, GKV_InclinometerData *)>ptrReceivedPacketProcessingFun);
+        void SetBINSDataReceivedCallback(std::function<void(LMP_Device*, GKV_BINSData *)> ptrReceivedPacketProcessingFun);
+        void SetGNSSDataReceivedCallback(std::function<void(LMP_Device*, GKV_GpsData *)>ptrReceivedPacketProcessingFun);
+        void SetExtGNSSDataReceivedCallback(std::function<void(LMP_Device*, GKV_GpsDataExt *)>ptrReceivedPacketProcessingFun);
         void SetReceiveDataFunction(std::function<char *()>ptrRecPacketFun);
         void clear() { CTR = 0; }
 
         void SetReceiveBufferSize(uint16_t size) { if (size > 0) ReceivedDataSize = size; else ReceivedDataSize = 1; }
         uint16_t GetReceiveBufferSize() { return ReceivedDataSize;}
 
+    public:
+        struct __DeviceState
+        {
+            GKV_ID GeneralDeviceParameters;
+            GKV_Settings CurrentSettings;
+            GKV_CustomDataParam CurrentCustomPacketParameters;
+        }DeviceState;
+        uint8_t INT_PARAM_NUMBERS[10] = { GKV_ALG_INT_LAT_NOPH, GKV_ALG_INT_LON_NOPH, GKV_ALG_INT_ALT_NOPH,//parameters of GKV in int32 format
+                                 GKV_ALG_INT_LAT,GKV_ALG_INT_LON ,GKV_GNSS_INT_LAT,
+                                 GKV_GNSS_INT_LON, GKV_GPS_INT_X, GKV_GPS_INT_Y, GKV_GPS_INT_Z };//params of GKV in uint32 format
+        uint8_t UINT_PARAM_NUMBERS[3] = { GKV_UTC_TIME, GKV_GNSS_STATUS, GKV_ALG_STATE_STATUS };
     private:
 
         uint8_t parseCycle();
@@ -173,7 +184,7 @@ namespace Gyrovert
         void SendEmptyPacket(uint8_t type);
         void RecognisePacket(GKV_PacketBase* buf);
 
-        std::function<void(GKV_PacketBase *)> GKV_PacketProcessingCallback = nullptr;
+        std::function<void(LMP_Device *, GKV_PacketBase *)> GKV_PacketProcessingCallback = nullptr;
 
         std::thread Receiver;
         //Data Logger Parameters
@@ -194,18 +205,19 @@ namespace Gyrovert
         uint32_t CTR = 0;
         uint8_t device_address = 0x00;
 
+
         std::function<void(GKV_PacketBase *)>ptrSendFun = nullptr;
-        std::function<void(GKV_Settings *)> ptrSettingsPacketCallback=nullptr;
-        std::function<void(GKV_CustomDataParam *)> ptrCustomPacketParamCallback = nullptr;
-        std::function<void(GKV_ID *)>ptrDeviceIDCallback = nullptr;
-        std::function<void(GKV_ADCData *)> ptrADCPacketCallback = nullptr;
-        std::function<void(GKV_RawData *)> ptrRawDataPacketCallback = nullptr;
-        std::function<void(GKV_GyrovertData *)>ptrGyrovertDataPacketCallback = nullptr;
-        std::function<void(GKV_InclinometerData *)>ptrInclinometerDataPacketCallback = nullptr;
-        std::function<void(GKV_BINSData *)>ptrBINSDataPacketCallback = nullptr;
-        std::function<void(GKV_GpsData *)>ptrGNSSDataPacketCallback = nullptr;
-        std::function<void(GKV_GpsDataExt *)>ptrExtGNSSDataPacketCallback = nullptr;
-        std::function<void(GKV_CustomData *)>ptrCustomDataPacketCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_Settings *)> ptrSettingsPacketCallback=nullptr;
+        std::function<void(LMP_Device*, GKV_CustomDataParam *)> ptrCustomPacketParamCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_ID *)>ptrDeviceIDCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_ADCData *)> ptrADCPacketCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_RawData *)> ptrRawDataPacketCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_GyrovertData *)>ptrGyrovertDataPacketCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_InclinometerData *)>ptrInclinometerDataPacketCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_BINSData *)>ptrBINSDataPacketCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_GpsData *)>ptrGNSSDataPacketCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_GpsDataExt *)>ptrExtGNSSDataPacketCallback = nullptr;
+        std::function<void(LMP_Device*, GKV_CustomData *)>ptrCustomDataPacketCallback = nullptr;
 
 
         bool CheckConnectionRequestedFlag = false;
@@ -214,16 +226,12 @@ namespace Gyrovert
         bool SettingsRequestedFlag = false;
         bool CustomPacketParamSentFlag = false;
         bool CustomPacketParamRequestedFlag = false;
+        bool CustomPacketParamReceivedFlag = false;
         bool DataRequestedFlag = false;
         bool gkv_open = true;
         bool DataWritingEnabled = false;
 
-        struct __DeviceState
-        {
-            GKV_ID GeneralDeviceParameters;
-            GKV_Settings CurrentSettings;
-            GKV_CustomDataParam CurrentCustomPacketParameters;
-        }DeviceState;
+
 
         std::function<char *()>ptrRecFcn = nullptr;
         enum EStatus
@@ -234,6 +242,8 @@ namespace Gyrovert
         };
 
         uint16_t ReceivedDataSize = 1;
+
+
     };
 }
 #endif

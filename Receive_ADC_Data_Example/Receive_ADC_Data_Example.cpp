@@ -14,7 +14,7 @@ uint8_t algorithm_selected = 0;
 bool InitSerialPort(string port_name, int32_t baudrate);
 char* ReadCOM();
 void WriteCOM(GKV_PacketBase* buf);
-void ShowPacketData(GKV_ADCData* buf);
+void ShowPacketData(LMP_Device* GKV, GKV_ADCData* buf);
 
 int main()
 {
@@ -100,7 +100,7 @@ char* ReadCOM()
     return 0;
 }
 
-void ShowPacketData(GKV_ADCData* packet)
+void ShowPacketData(LMP_Device* GKV, GKV_ADCData* packet)
 {
     char str[30];
     sprintf(str, "%d", packet->sample_cnt);

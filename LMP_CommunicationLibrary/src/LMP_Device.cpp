@@ -108,7 +108,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received PacketBase structure
       * @retval no return value.
       */
-    void  LMP_Device::SetReceivedPacketCallback(std::function<void(GKV_PacketBase *)> ptrReceivedPacketProcessingFun)
+    void  LMP_Device::SetReceivedPacketCallback(std::function<void(LMP_Device *, GKV_PacketBase *)> ptrReceivedPacketProcessingFun)
     {
         GKV_PacketProcessingCallback = ptrReceivedPacketProcessingFun;
     }
@@ -119,7 +119,7 @@ namespace Gyrovert
       * @param  ptrSendPacketFun - pointer on void-type user callback function that gets pointer on received and parsed Settings structure
       * @retval no return value.
       */
-    void LMP_Device::SetSettingsReceivedCallback(std::function<void(GKV_Settings *)> ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetSettingsReceivedCallback(std::function<void(LMP_Device*, GKV_Settings *)> ptrReceivedPacketProcessingFun)
     {
         ptrSettingsPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -130,7 +130,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed custom data parameters structure
       * @retval no return value.
       */
-    void LMP_Device::SetCustomPacketParamReceivedCallback(std::function<void(GKV_CustomDataParam *)> ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetCustomPacketParamReceivedCallback(std::function<void(LMP_Device*, GKV_CustomDataParam *)> ptrReceivedPacketProcessingFun)
     {
         ptrCustomPacketParamCallback = ptrReceivedPacketProcessingFun;
     }
@@ -141,7 +141,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed custom packet structure
       * @retval no return value.
       */
-    void LMP_Device::SetCustomPacketReceivedCallback(std::function<void(GKV_CustomData *)>ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetCustomPacketReceivedCallback(std::function<void(LMP_Device*, GKV_CustomData *)>ptrReceivedPacketProcessingFun)
     {
         ptrCustomDataPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -152,7 +152,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed ADC Codes structure
       * @retval no return value.
       */
-    void LMP_Device::SetADCDataReceivedCallback(std::function<void(GKV_ADCData *)> ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetADCDataReceivedCallback(std::function<void(LMP_Device*, GKV_ADCData *)> ptrReceivedPacketProcessingFun)
     {
         ptrADCPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -163,7 +163,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed Calibrated Sensors Data structure
       * @retval no return value.
       */
-    void LMP_Device::SetRawDataReceivedCallback(std::function<void(GKV_RawData *)> ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetRawDataReceivedCallback(std::function<void(LMP_Device*, GKV_RawData *)> ptrReceivedPacketProcessingFun)
     {
         ptrRawDataPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -174,7 +174,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed Orientation Data structure
       * @retval no return value.
       */
-    void LMP_Device::SetGyrovertDataReceivedCallback(std::function<void(GKV_GyrovertData *)> ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetGyrovertDataReceivedCallback(std::function<void(LMP_Device*, GKV_GyrovertData *)> ptrReceivedPacketProcessingFun)
     {
         ptrGyrovertDataPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -185,7 +185,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed Inclinometer Data structure
       * @retval no return value.
       */
-    void LMP_Device::SetInclinometerDataReceivedCallback(std::function<void(GKV_InclinometerData *)>ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetInclinometerDataReceivedCallback(std::function<void(LMP_Device*, GKV_InclinometerData *)>ptrReceivedPacketProcessingFun)
     {
         ptrInclinometerDataPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -196,7 +196,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed BINS Data structure
       * @retval no return value.
       */
-    void LMP_Device::SetBINSDataReceivedCallback(std::function<void(GKV_BINSData *)> ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetBINSDataReceivedCallback(std::function<void(LMP_Device*, GKV_BINSData *)> ptrReceivedPacketProcessingFun)
     {
         ptrBINSDataPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -207,7 +207,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed GNSS Data structure
       * @retval no return value.
       */
-    void LMP_Device::SetGNSSDataReceivedCallback(std::function<void(GKV_GpsData *)>ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetGNSSDataReceivedCallback(std::function<void(LMP_Device*, GKV_GpsData *)>ptrReceivedPacketProcessingFun)
     {
         ptrGNSSDataPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -218,7 +218,7 @@ namespace Gyrovert
       * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on received and parsed Extended GNSS Data structure
       * @retval no return value.
       */
-    void LMP_Device::SetExtGNSSDataReceivedCallback(std::function<void(GKV_GpsDataExt *)>ptrReceivedPacketProcessingFun)
+    void LMP_Device::SetExtGNSSDataReceivedCallback(std::function<void(LMP_Device*, GKV_GpsDataExt *)>ptrReceivedPacketProcessingFun)
     {
         ptrExtGNSSDataPacketCallback = ptrReceivedPacketProcessingFun;
     }
@@ -668,7 +668,7 @@ namespace Gyrovert
                 memcpy(CurrentReceivedPacket, &InputPacket, (((GKV_PacketBase*)&InputPacket)->length + 8));
                 if (GKV_PacketProcessingCallback)
                 {
-                    GKV_PacketProcessingCallback(CurrentReceivedPacket);
+                    GKV_PacketProcessingCallback(this,CurrentReceivedPacket);
                 }
                 RecognisePacket(CurrentReceivedPacket);
                 if (!refind_preamble(((GKV_PacketBase*)&InputPacket)->length + 8))
@@ -759,7 +759,7 @@ namespace Gyrovert
             memcpy(&(data), &(buf->data), sizeof(data));
             if (ptrADCPacketCallback)
             {
-                ptrADCPacketCallback(&data);
+                ptrADCPacketCallback(this, &data);
             }
             break;
         }
@@ -769,7 +769,7 @@ namespace Gyrovert
             memcpy(&(data), &(buf->data), sizeof(data));
             if (ptrRawDataPacketCallback)
             {
-                ptrRawDataPacketCallback(&data);
+                ptrRawDataPacketCallback(this, &data);
             }
             break;
         }
@@ -779,7 +779,7 @@ namespace Gyrovert
             memcpy(&(data), &(buf->data), sizeof(data));
             if (ptrGyrovertDataPacketCallback)
             {
-                ptrGyrovertDataPacketCallback(&data);
+                ptrGyrovertDataPacketCallback(this, &data);
             }
             break;
         }
@@ -789,7 +789,7 @@ namespace Gyrovert
             memcpy(&(data), &(buf->data), sizeof(data));
             if (ptrInclinometerDataPacketCallback)
             {
-                ptrInclinometerDataPacketCallback(&data);
+                ptrInclinometerDataPacketCallback(this, &data);
             }
             break;
         }
@@ -799,7 +799,7 @@ namespace Gyrovert
             memcpy(&(data), &(buf->data), sizeof(data));
             if (ptrBINSDataPacketCallback)
             {
-                ptrBINSDataPacketCallback(&data);
+                ptrBINSDataPacketCallback(this, &data);
             }
             break;
         }
@@ -810,7 +810,7 @@ namespace Gyrovert
 
             if (ptrGNSSDataPacketCallback)
             {
-                ptrGNSSDataPacketCallback(&data);
+                ptrGNSSDataPacketCallback(this, &data);
             }
             break;
         }
@@ -820,37 +820,38 @@ namespace Gyrovert
             memcpy(&(data), &(buf->data), buf->length);
             if (ptrCustomDataPacketCallback)
             {
-                ptrCustomDataPacketCallback(&data);
+                ptrCustomDataPacketCallback(this, &data);
             }        break;
         }
         case GKV_DEV_ID_PACKET:
         {
-            memcpy(&(DeviceState.GeneralDeviceParameters), &buf->data, sizeof(GKV_ID));
+            memcpy(&(DeviceState.GeneralDeviceParameters), &(buf->data), sizeof(GKV_ID));
             device_address=buf->address;
             DeviceIDRequestedFlag = false;
             if (ptrDeviceIDCallback)
             {
-                ptrDeviceIDCallback(&(DeviceState.GeneralDeviceParameters));
+                ptrDeviceIDCallback(this, &(DeviceState.GeneralDeviceParameters));
             }
             break;
         }
         case GKV_DEV_SETTINGS_PACKET:
         {
-            memcpy(&(DeviceState.CurrentSettings), &buf->data, sizeof(GKV_Settings));
+            memcpy(&(DeviceState.CurrentSettings), &(buf->data), sizeof(GKV_Settings));
             SettingsRequestedFlag = false;
             if (ptrSettingsPacketCallback)
             {
-                ptrSettingsPacketCallback(&(DeviceState.CurrentSettings));
+                ptrSettingsPacketCallback(this, &(DeviceState.CurrentSettings));
             }
             break;
         }
         case GKV_CUSTOM_DATA_PARAM_PACKET:
         {
-            memcpy(&(DeviceState.CurrentCustomPacketParameters), &buf->data, sizeof(GKV_CustomDataParam));
+            memcpy(&(DeviceState.CurrentCustomPacketParameters), &(buf->data), sizeof(GKV_CustomDataParam));
             CustomPacketParamRequestedFlag = false;
+            CustomPacketParamReceivedFlag = true;
             if (ptrCustomPacketParamCallback)
             {
-                ptrCustomPacketParamCallback(&(DeviceState.CurrentCustomPacketParameters));
+                ptrCustomPacketParamCallback(this, &(DeviceState.CurrentCustomPacketParameters));
             }
             break;
         }
@@ -858,6 +859,7 @@ namespace Gyrovert
         {
             if (CustomPacketParamSentFlag)
             {
+                CustomPacketParamReceivedFlag = false;
                 CustomPacketParamSentFlag = false;
             }
             if (SettingsSentFlag)
