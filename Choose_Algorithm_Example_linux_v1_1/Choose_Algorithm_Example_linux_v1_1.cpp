@@ -11,7 +11,7 @@ uint8_t algorithm = GKV_ADC_CODES_ALGORITHM;
 uint8_t algorithm_packet = 0;
 uint8_t algorithm_selected = 0;
 
-void RecognisePacket(GKV_PacketBase* buf);
+void RecognisePacket(LMP_Device* GKV, GKV_PacketBase* buf);
 uint8_t check_input(string str);
 uint8_t ChooseAlgorithmPacket(uint8_t algorithm);
 
@@ -146,7 +146,7 @@ uint8_t ChooseAlgorithmPacket(uint8_t algorithm)
     }
 }
 
-void RecognisePacket(GKV_PacketBase* buf)
+void RecognisePacket(LMP_Device* GKV, GKV_PacketBase* buf)
 {
     char str[30];
     if (algorithm_selected)
@@ -353,7 +353,7 @@ void RecognisePacket(GKV_PacketBase* buf)
     }
     else
     {
-        //if (buf->type == GKV_CUSTOM_PACKET)) algorithm_selected = 1;// check for custom  data stream. Uncomment to use this type (with custom packet selection in main)
+        //if (buf->type == GKV_CUSTOM_PACKET) algorithm_selected = 1;// check for custom  data stream. Uncomment to use this type (with custom packet selection in main)
         if (buf->type == algorithm_packet) algorithm_selected = 1;// check for algorithm selection with default packet 
     }
 }

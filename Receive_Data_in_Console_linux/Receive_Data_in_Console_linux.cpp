@@ -259,36 +259,39 @@ void RecognisePacket(LMP_Device* GKV, GKV_PacketBase* buf)
             GKV_CustomData* packet;
             packet = (GKV_CustomData*)&buf->data;
             cout << "CustomPacket: ";
-            if (GKV->IsCustomPacketParamReceived())//if custom parameters list received
+            for (uint8_t i = 0; i < ((buf->length) / 4); i++)
             {
-                uint8_t CurrentParameterType = FloatParameter;
-                for (uint8_t j = 0; j < sizeof(GKV->INT_PARAM_NUMBERS); j++)
+                if (GKV->IsCustomPacketParamReceived())//if custom parameters list received
                 {
-                    if (GKV->DeviceState.CurrentCustomPacketParameters.param[i] == GKV->INT_PARAM_NUMBERS[j])
+                    uint8_t CurrentParameterType = FloatParameter;
+                    for (uint8_t j = 0; j < sizeof(GKV->INT_PARAM_NUMBERS); j++)
                     {
-                        CurrentParameterType = Int32Parameter;
-                        break;
+                        if (GKV->DeviceState.CurrentCustomPacketParameters.param[i] == GKV->INT_PARAM_NUMBERS[j])
+                        {
+                            CurrentParameterType = Int32Parameter;
+                            break;
+                        }
                     }
-                }
-                for (uint8_t j = 0; j < sizeof(GKV->UINT_PARAM_NUMBERS); j++)
-                {
-                    if (GKV->DeviceState.CurrentCustomPacketParameters.param[i] == GKV->UINT_PARAM_NUMBERS[j])
+                    for (uint8_t j = 0; j < sizeof(GKV->UINT_PARAM_NUMBERS); j++)
                     {
-                        CurrentParameterType = Uint32Parameter;
-                        break;
+                        if (GKV->DeviceState.CurrentCustomPacketParameters.param[i] == GKV->UINT_PARAM_NUMBERS[j])
+                        {
+                            CurrentParameterType = Uint32Parameter;
+                            break;
+                        }
                     }
-                }
-                if (CurrentParameterType == FloatParameter)
-                {
-                    cout << "param = " << (packet->parameter[i]) << ' ';
-                }
-                else if (CurrentParameterType == Int32Parameter)
-                {
-                    cout << "param = " << *(int32_t*)&(packet->parameter[i]) << ' ';
-                }
-                else
-                {
-                    cout << "param = " << *(uint32_t*)&(packet->parameter[i]) << ' ';
+                    if (CurrentParameterType == FloatParameter)
+                    {
+                        cout << "param = " << (packet->parameter[i]) << ' ';
+                    }
+                    else if (CurrentParameterType == Int32Parameter)
+                    {
+                        cout << "param = " << *(int32_t*)&(packet->parameter[i]) << ' ';
+                    }
+                    else
+                    {
+                        cout << "param = " << *(uint32_t*)&(packet->parameter[i]) << ' ';
+                    }
                 }
             }
             cout << endl;
