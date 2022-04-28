@@ -199,6 +199,8 @@
 #define GKV_SECOND_RS_485_ORIENT_SYSTEMS		           	0x07                               /*  Orient Systems Protocol (only on order with receiver)*/
 #define GKV_SECOND_RS_485_NOVATEL_OEM_7			        	0x08                               /*  Protocol of Novatel OEM6    */
 #define GKV_SECOND_RS_485_UBLOX								0x09                               /*  Ublox (NAV-PVT, NAV-HHREFLLA, NAVPOSNED)  */
+#define GKV_SECOND_RS_485_PASSTHROUGH						0x0A                               /*  Passthrow (data received on second RS-485 will be sent to main port in 0x42 packet)  */
+
 /**
   * @}
   */

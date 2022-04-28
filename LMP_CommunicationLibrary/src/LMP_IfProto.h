@@ -1,5 +1,5 @@
-#ifndef __LMP_IF_PROTO_h__
-#define __LMP_IF_PROTO_h__
+#ifndef __LMP_IF_PROTO_H__
+#define __LMP_IF_PROTO_H__
 
 
 #include <stdint.h>
@@ -76,8 +76,8 @@ struct IfProtoConfig
 	// Если на запрос возвращается длина 0 - данный тип не поддерживается
 	uint8_t payload[128];
 
-	Q_GADGET
-	Q_ENUM(EIFace)
+	//Q_GADGET
+	//Q_ENUM(EIFace)
 };
 
 #pragma pack(2)
@@ -107,11 +107,11 @@ struct IfCanConfig
 	uint16_t proto;
 	CanId io_id;         // !is_valid() (установлен 30 бит) - отключен
 
-	Q_GADGET
-	Q_ENUM(EProto)
-	Q_PROPERTY(unsigned baudrate_k MEMBER baudrate_k)
-	Q_PROPERTY(unsigned proto MEMBER proto)
-	Q_PROPERTY(unsigned io_id MEMBER io_id)
+	//Q_GADGET
+	//Q_ENUM(EProto)
+	//Q_PROPERTY(unsigned baudrate_k MEMBER baudrate_k)
+	//Q_PROPERTY(unsigned proto MEMBER proto)
+	//Q_PROPERTY(unsigned io_id MEMBER io_id)
 };
 struct IfCanMessage
 {
@@ -138,10 +138,10 @@ struct IfCanMessage
 	uint16_t prescaler; // 0 - сообщение отключено
 	CanId id;
 
-	Q_GADGET
-	Q_ENUM(EIndex)
-	Q_PROPERTY(unsigned prescaler MEMBER prescaler)
-	Q_PROPERTY(unsigned id MEMBER id)
+	//Q_GADGET
+	//Q_ENUM(EIndex)
+	//Q_PROPERTY(unsigned prescaler MEMBER prescaler)
+	//Q_PROPERTY(unsigned id MEMBER id)
 };
 
 struct IfUartConfig
@@ -228,24 +228,24 @@ struct IfUartConfig
 		return p;
 	}
 
-	Q_GADGET
-	Q_ENUM(EBaudRate)
-	Q_ENUM(EProto)
-	Q_ENUM(EMode)
-	Q_ENUM(EProtoParam)
-	Q_PROPERTY(unsigned baudrate MEMBER baudrate)
-	Q_PROPERTY(unsigned proto MEMBER proto)
-	Q_PROPERTY(unsigned proto_param MEMBER proto_param)
-	Q_PROPERTY(unsigned mode MEMBER mode)
+	//Q_GADGET
+	//Q_ENUM(EBaudRate)
+	//Q_ENUM(EProto)
+	//Q_ENUM(EMode)
+	//Q_ENUM(EProtoParam)
+	//Q_PROPERTY(unsigned baudrate MEMBER baudrate)
+	//Q_PROPERTY(unsigned proto MEMBER proto)
+	//Q_PROPERTY(unsigned proto_param MEMBER proto_param)
+	//Q_PROPERTY(unsigned mode MEMBER mode)
 };
 struct IfUartForward
 {
 	uint16_t buf_size; // 0 - отключено
 	uint8_t iface;
 
-	Q_GADGET
-	Q_PROPERTY(unsigned buf_size MEMBER buf_size)
-	Q_PROPERTY(unsigned iface MEMBER iface)
+	//Q_GADGET
+	//Q_PROPERTY(unsigned buf_size MEMBER buf_size)
+	//Q_PROPERTY(unsigned iface MEMBER iface)
 };
 
 namespace CanMsg {

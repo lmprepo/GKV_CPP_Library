@@ -33,7 +33,7 @@
   *
   ******************************************************************************
   */
-
+#include "LMP_IfProto.h"
 #include "LMP_Device.h"
 namespace Gyrovert
 {
@@ -296,8 +296,8 @@ namespace Gyrovert
 
     /**
         *@name	SetDataRatePrescaler
-        * @brief  Function configuresand sends Settings Packet(type = 0x07) with selected algorithm number
-        * @param  algorithm_register_value - number of selected algorithm
+        * @brief  Function configures and sends Settings Packet(type = 0x07) with selected data rate prescaler from default value (1000 Hz)
+        * @param  rate_prescaler - quantity of packets filtered
         * @retval no return value.
         */
     void LMP_Device::SetDataRatePrescaler(uint8_t rate_prescaler)
@@ -315,6 +315,103 @@ namespace Gyrovert
         Send_Data();
     }
 
+    /**
+    *@name	SetSecondRS485PortMode
+    * @brief  Function configures and sends Settings Packet(type = 0x07) with selected mode of second RS-485
+    * @param  mode - selected type of GNSS receiver for second RS-485 or passthrough mode
+    * @retval no return value.
+    */
+    void LMP_Device::SetSecondRS485PortMode(uint8_t mode)
+    {
+        GKV_Settings GKV_Settings;
+        memset(&GKV_Settings, 0, sizeof(GKV_Settings));
+        uint8_t type = GKV_DEV_SETTINGS_PACKET;
+        if (mode <= GKV_SECOND_RS_485_PASSTHROUGH)
+        {
+            GKV_Settings.param_mask |= GKV_CHANGE_SECOND_RS485_MODE;
+            GKV_Settings.aux_485_type = mode;
+        }
+        Configure_Output_Packet(type, &GKV_Settings, sizeof(GKV_Settings));
+        Send_Data();
+    }
+
+    /**
+      * @name	SetSyncOutType
+      * @brief  Function configures and sends Settings Packet (type=0x07) with type of output synchrosignal (pulse or toggle).
+      * @retval no return value.
+      */
+    void LMP_Device::SetSyncOutType(uint16_t sync_type)
+    {
+        GKV_Settings GKV_Settings;
+        memset(&GKV_Settings, 0, sizeof(GKV_Settings));
+        uint8_t type = GKV_DEV_SETTINGS_PACKET;
+        GKV_Settings.mode = sync_type;
+        GKV_Settings.mode_mask = GKV_ALLOW_CHANGE_OUTPUT_SYNC;
+        Configure_Output_Packet(type, &GKV_Settings, sizeof(GKV_Settings));
+        Send_Data();
+    }
+
+    /**
+      *  *@name	SetAUXPortMode
+        * @brief  Function configures and sends IfProto Packet(type = 0x30) with selected mode of second RS-485 using IfProto Settings.
+        * @retval no return value.
+        */
+    void LMP_Device::SetAUXPortMode(uint8_t cmd, uint8_t port, uint16_t protocol, uint16_t baudrate, uint16_t mode)
+    {
+        struct IfProtoConfig IFProtpDataField;
+        struct IfUartConfig UartConfigField;
+        IFProtpDataField.iface = port;
+        IFProtpDataField.cmd = cmd;
+        IFProtpDataField.index = 0;
+        IFProtpDataField.reserved = 0;
+        UartConfigField.baudrate = baudrate;
+        UartConfigField.proto = protocol;
+        UartConfigField.mode = mode;
+        memcpy(&(IFProtpDataField.payload), &UartConfigField, sizeof(UartConfigField));
+        Configure_Output_Packet(IfProtoConfig::type, &IFProtpDataField, sizeof(UartConfigField) + 4);
+        Send_Data();
+    }
+
+    /**
+      *  *@name	SetCANPortMode
+        * @brief  Function configures and sends IfProto Packet(type = 0x30) with selected mode of CAN interface using IfProto Settings.
+        * @retval no return value.
+        */
+    void LMP_Device::SetCANPortMode(uint8_t port, uint16_t protocol, uint16_t baudrate)
+    {
+        struct IfProtoConfig IFProtpDataField;
+        struct IfCanConfig CANConfigField;
+        IFProtpDataField.iface = port;
+        IFProtpDataField.cmd = IfProtoConfig::CMD_CONFIG;
+        IFProtpDataField.index = 0;
+        IFProtpDataField.reserved = 0;
+        CANConfigField.baudrate_k = baudrate;
+        CANConfigField.proto = protocol;
+        memcpy(&(IFProtpDataField.payload), &CANConfigField, sizeof(CANConfigField));
+        Configure_Output_Packet(IfProtoConfig::type, &IFProtpDataField, sizeof(CANConfigField) + 4);
+        Send_Data();
+    }
+
+
+    /**
+      *  *@name	SetCANPortMsg
+        * @brief  Function configures and sends IfProto Packet(type = 0x30) with selected message that will be sent by CAN interface.
+        * @retval no return value.
+        */
+    void LMP_Device::SetCANPortMsg(uint8_t port, uint8_t index, uint16_t prescaler, uint32_t id)
+    {
+        IfProtoConfig IFProtpDataField;
+        IfCanMessage CANMesField;
+        IFProtpDataField.iface = port;
+        IFProtpDataField.cmd = IfProtoConfig::CMD_MESSAGE;
+        IFProtpDataField.index = index;
+        IFProtpDataField.reserved = 0;
+        CANMesField.prescaler = prescaler;
+        CANMesField.id = id;
+        memcpy(&(IFProtpDataField.payload), &CANMesField, sizeof(CANMesField));
+        Configure_Output_Packet(IfProtoConfig::type, &IFProtpDataField, sizeof(CANMesField) + 4);
+        Send_Data();
+    }
     /**
       * @name	SetBaudrate
       * @brief  Function configures and sends Settings Packet (type=0x07) with selected baudrate number

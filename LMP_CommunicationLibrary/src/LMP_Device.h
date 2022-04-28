@@ -130,6 +130,13 @@ namespace Gyrovert
         void SetAngularRateUnits(uint8_t units);
         void SetAngleUnits(uint8_t units);
 
+        void SetSyncOutType(uint16_t type);
+
+        void SetSecondRS485PortMode(uint8_t mode);
+        void SetAUXPortMode(uint8_t cmd, uint8_t port, uint16_t protocol, uint16_t baudrate, uint16_t mode);
+        void SetCANPortMode(uint8_t port, uint16_t protocol, uint16_t baudrate);
+        void SetCANPortMsg(uint8_t port, uint8_t index, uint16_t prescaler, uint32_t id);
+
         virtual void WriteDataToGKV(GKV_PacketBase* data) {};
         virtual char* ReadDataFromGKV() { return 0; };
 
