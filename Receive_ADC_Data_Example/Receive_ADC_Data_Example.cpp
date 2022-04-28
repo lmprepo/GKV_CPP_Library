@@ -37,10 +37,12 @@ int main()
     {
         GKV->SetDefaultAlgorithmPacket();
         GKV->SetAlgorithm(GKV_ADC_CODES_ALGORITHM);
+        _sleep(10);
     }
     cout << "#start main loop\n";
     while (1)
     {
+        _sleep(1000);
         //do something
     }
     return 0;
@@ -102,21 +104,16 @@ char* ReadCOM()
 
 void ShowPacketData(LMP_Device* GKV, GKV_ADCData* packet)
 {
-    char str[30];
-    sprintf(str, "%d", packet->sample_cnt);
-    cout << "Sample Counter = " << str << ' ';
-    sprintf_s(str, "%d", packet->a[0]);
-    cout << "ax = " << str << ' ';
-    sprintf_s(str, "%d", packet->a[1]);
-    cout << "ay = " << str << ' ';
-    sprintf_s(str, "%d", packet->a[2]);
-    cout << "az = " << str << ' ';
-    sprintf_s(str, "%d", packet->w[0]);
-    cout << "wx = " << str << ' ';
-    sprintf_s(str, "%d", packet->w[1]);
-    cout << "wy = " << str << ' ';
-    sprintf_s(str, "%d", packet->w[2]);
-    cout << "wz = " << str << endl;
+    string output_str;
+    output_str.append("ADC Data Packet: ");
+    output_str.append("Sample Counter = " + std::to_string(packet->sample_cnt));
+    output_str.append(" ax = " + std::to_string((int32_t)packet->a[0]));
+    output_str.append(" ay = " + std::to_string((int32_t)packet->a[1]));
+    output_str.append(" az = " + std::to_string((int32_t)packet->a[2]));
+    output_str.append(" wx = " + std::to_string((int32_t)packet->w[0]));
+    output_str.append(" wy = " + std::to_string((int32_t)packet->w[1]));
+    output_str.append(" wz = " + std::to_string((int32_t)packet->w[2]));
+    cout << output_str << endl;
     algorithm_selected = 1;
 }
 #else
