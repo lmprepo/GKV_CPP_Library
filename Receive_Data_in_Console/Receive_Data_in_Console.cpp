@@ -3,7 +3,9 @@
 #include <iostream>
 #include <stdio.h>
 #include "LMP_Device.h"
+
 using namespace Gyrovert;
+
 using namespace std;
 
 HANDLE hSerial;
@@ -31,6 +33,7 @@ int main()
     GKV->SetReceiveDataFunction(ReadCOM);//Set User Function That Receives Data From Serial Port And Returns Received Byte
     GKV->SetSendDataFunction(WriteCOM);//Set User Function That Sends Data to Serial Port connected to GKV
     GKV->RunDevice();//Run Thread For Receiving Data From GKV
+    GKV->SetCANPortMsg(IfProtoConfig::IFACE_CAN1, IfCanMessage::INDEX_STATUS_CNT, 10, 0x10);
     cout << "#start main loop\n";
     while (1)
     {

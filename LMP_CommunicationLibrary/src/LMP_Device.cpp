@@ -33,7 +33,6 @@
   *
   ******************************************************************************
   */
-#include "LMP_IfProto.h"
 #include "LMP_Device.h"
 namespace Gyrovert
 {

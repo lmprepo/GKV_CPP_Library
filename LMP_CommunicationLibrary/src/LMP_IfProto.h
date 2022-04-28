@@ -4,9 +4,6 @@
 
 #include <stdint.h>
 
-namespace Gyrovert
-{
-
 struct CanId {
 	enum {
 		ID_INVALID = 0x40000000,
@@ -330,6 +327,6 @@ namespace CanMsg {
 
 #pragma pack(pop)
 
-}
+
 
 #endif // proto_gyrovert_ifproto_h__
