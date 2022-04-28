@@ -10,6 +10,7 @@ add_library(LMP_CommunicationLibrary
     src/LMP_Device.h
     src/LMP_CustomPacket.h
     src/LMP_FilterPacket.h
+    src/LMP_IfProto.h
     src/LMP_GyroOffsetPacket.h
     src/LMP_SettingsPacket.h
     src/LMP_TestPacket.h)

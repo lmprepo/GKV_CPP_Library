@@ -58,6 +58,7 @@ namespace Gyrovert
 #include "LMP_FilterPacket.h"
 #include "LMP_AlgParamPacket.h"
 #include "LMP_GyroOffsetPacket.h"
+#include "LMP_IfProto.h"
 
 //ACCELERATION UNITS
 #define GKV_MS2 1
@@ -123,6 +124,7 @@ namespace Gyrovert
         void SetDefaultAlgorithmPacket();
         void SetCustomAlgorithmPacket();
         void SetCustomPacketParam(uint8_t* param_array_ptr, uint8_t quantity_of_params);
+        void SetDataRatePrescaler(uint8_t rate_prescaler);
 
         void SetAccelerationUnits(uint8_t units);
         void SetAngularRateUnits(uint8_t units);
@@ -137,6 +139,9 @@ namespace Gyrovert
         void RequestData();
         void RequestCustomPacketParams();
         void ResetDevice();
+
+
+
         bool IsCustomPacketParamReceived() { return CustomPacketParamReceivedFlag; }
         uint8_t GetInputPacketType();
         uint8_t GetDeviceAddress() { return device_address; }

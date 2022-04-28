@@ -295,6 +295,27 @@ namespace Gyrovert
     }
 
     /**
+        *@name	SetDataRatePrescaler
+        * @brief  Function configuresand sends Settings Packet(type = 0x07) with selected algorithm number
+        * @param  algorithm_register_value - number of selected algorithm
+        * @retval no return value.
+        */
+    void LMP_Device::SetDataRatePrescaler(uint8_t rate_prescaler)
+    {
+        GKV_Settings GKV_Settings;
+        memset(&GKV_Settings, 0, sizeof(GKV_Settings));
+        uint8_t type = GKV_DEV_SETTINGS_PACKET;
+
+        if (rate_prescaler <= 1000)
+        {
+            GKV_Settings.param_mask |= GKV_CHANGE_BASE_FREQ;
+            GKV_Settings.rate_prescaler = rate_prescaler;
+        }
+        Configure_Output_Packet(type, &GKV_Settings, sizeof(GKV_Settings));
+        Send_Data();
+    }
+
+    /**
       * @name	SetBaudrate
       * @brief  Function configures and sends Settings Packet (type=0x07) with selected baudrate number
       * @param  baudrate_register_value - number of selected baudrate of main RS-422 interface
