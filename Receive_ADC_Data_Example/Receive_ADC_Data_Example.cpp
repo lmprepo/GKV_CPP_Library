@@ -105,6 +105,7 @@ char* ReadCOM()
                 return ReceivedData;
             }
         }
+        _sleep(10);
     }
     return 0;
 }

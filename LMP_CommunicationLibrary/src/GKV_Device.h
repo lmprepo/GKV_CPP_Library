@@ -115,6 +115,7 @@ namespace Gyrovert
                             return inBuffer;
                         }
                     }
+                    _sleep(10);
                 }
             }
             return 0;

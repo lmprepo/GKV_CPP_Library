@@ -1021,7 +1021,7 @@ namespace Gyrovert
         while (gkv_open)
         {
             Receive_Process();
-            _sleep(1);
+            _sleep(10);
         }
     }
 

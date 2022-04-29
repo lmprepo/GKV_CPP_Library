@@ -9,6 +9,9 @@ using namespace Gyrovert;
 using namespace std;
 
 HANDLE hSerial;
+OVERLAPPED o;
+DWORD dwEvtMask;
+
 LMP_Device* GKV;
 
 bool InitSerialPort(string port_name, int32_t baudrate);
@@ -91,14 +94,15 @@ char* ReadCOM()
     while (true)
     {
         iRet = ReadFile(hSerial, &ReceivedData, sizeof(ReceivedData), &iSize, 0);
-        if (iRet)
-        {
-            if (iSize > 0)
-            {
-                GKV->SetReceiveBufferSize(iSize);
-                return ReceivedData;
-            }
-        }
+                if (iRet)
+                {
+                    if (iSize > 0)
+                    {
+                        GKV->SetReceiveBufferSize(iSize);
+                        return ReceivedData;
+                    }
+                }
+                _sleep(10);
     }
     return 0;
 }
