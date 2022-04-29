@@ -11,8 +11,7 @@ using namespace std;
 
 int SerialPortHandle;
 uint8_t algorithm_selected = 0;
-char ReceivedData=0;
-
+LMP_Device* GKV;
 bool InitSerialPort(string port_name, int32_t baudrate);
 char* ReadCOM();
 void WriteCOM(GKV_PacketBase* buf);
@@ -25,7 +24,7 @@ int main()
     cin >> com_port;
     cout << "#start connecting to " << com_port << "\n";
     /* Create LMP Device Object GKV */
-    LMP_Device *GKV = new LMP_Device();
+    GKV = new LMP_Device();
     /* Serial Port Settings For Linux */
     if (!(InitSerialPort(com_port, B921600))) return 1;
     /* GKV Settings */
@@ -95,10 +94,11 @@ void WriteCOM(GKV_PacketBase* buf)
 
 char* ReadCOM()
 {
-    char sReceivedChar;
+    static char ReceivedData[2048] = { 0 };
     while (true)
     {
-        int iOut = read(SerialPortHandle, &ReceivedData, 1);
+        int iOut = read(SerialPortHandle, &ReceivedData, 2048);
+        GKV->SetReceiveBufferSize(iOut);
         return &ReceivedData;
     }
     return 0;
