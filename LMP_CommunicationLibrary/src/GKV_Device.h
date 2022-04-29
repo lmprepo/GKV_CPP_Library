@@ -97,24 +97,6 @@ namespace Gyrovert
             }
         }
 
-        //char ReadDataFromGKV() override
-        //{
-        //    if (SerialInitialized)
-        //    {
-        //        DWORD iSize;
-        //        char sReceivedChar;
-        //        char iRet = 0;
-        //        while (true)
-        //        {
-        //            iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
-        //            if (iSize > 0)
-        //                return sReceivedChar;
-        //        }
-        //    }
-        //    return 0;
-        //}
-
-
         char* ReadDataFromGKV() override
         {
             if (SerialInitialized)
@@ -125,41 +107,18 @@ namespace Gyrovert
                 while (true)
                 {
                     iRet = ReadFile(hSerial, &inBuffer, 2048, &iSize, 0);
-                    if (iSize > 0)
+                    if (iRet)
                     {
-                        SetReceiveBufferSize(iSize);
-                        return inBuffer;
+                        if (iSize > 0)
+                        {
+                            SetReceiveBufferSize(iSize);
+                            return inBuffer;
+                        }
                     }
                 }
             }
             return 0;
         }
-
-        //std::vector<char> ReadDataFromGKV() override
-        //{
-
-        //    if (SerialInitialized)
-        //    {
-        //        DWORD iSize;
-        //        char sReceivedChar[2048];
-        //        std::vector<char> RetData;
-        //        char iRet = 0;
-        //        while (true)
-        //        {
-        //            iRet = ReadFile(hSerial, &sReceivedChar, 1, &iSize, 0);
-        //            if (iSize > 0)
-        //            {
-        //                for (uint16_t i = 0; i < iSize; i++)
-        //                {
-        //                    RetData.push_back(sReceivedChar[i]);
-        //                }
-
-        //            }
-        //            return RetData;
-        //        }
-        //    }
-        //    return (std::vector<char>)0;
-        //}
 
         bool GetSerialConnectionState()
         {

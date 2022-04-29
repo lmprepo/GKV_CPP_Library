@@ -9,7 +9,7 @@ using namespace Gyrovert;
 using namespace std;
 
 HANDLE hSerial;
-char ReceivedData=0;
+LMP_Device* GKV;
 
 bool InitSerialPort(string port_name, int32_t baudrate);
 char* ReadCOM();
@@ -24,7 +24,7 @@ int main()
     cin >> com_port;
     cout << "#start connecting to " << com_port << "\n";
     /* Create LMP Device Object GKV */
-    LMP_Device* GKV = new LMP_Device();
+    GKV = new LMP_Device();
     /* Serial Port Settings For Windows */
     com_port = "\\\\.\\" + com_port;
     if (!(InitSerialPort(com_port, 921600))) return 1;
@@ -85,13 +85,20 @@ void WriteCOM(GKV_PacketBase* buf)
 
 char* ReadCOM()
 {
+    static char ReceivedData[2048] = {0};
     DWORD iSize;
     char iRet = 0;
     while (true)
     {
         iRet = ReadFile(hSerial, &ReceivedData, sizeof(ReceivedData), &iSize, 0);
-        if (iSize > 0)
-            return &ReceivedData;
+        if (iRet)
+        {
+            if (iSize > 0)
+            {
+                GKV->SetReceiveBufferSize(iSize);
+                return ReceivedData;
+            }
+        }
     }
     return 0;
 }
