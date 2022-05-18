@@ -156,6 +156,7 @@ namespace Gyrovert
         void SetSendDataFunction(std::function<void(GKV_PacketBase *)>ptrSendPacketFun);
         void SetReceivedPacketCallback(std::function<void(LMP_Device *,GKV_PacketBase *)> ptrReceivedPacketProcessingFun);
         void SetSettingsReceivedCallback(std::function<void(LMP_Device*, GKV_Settings *)> ptrReceivedPacketProcessingFun);
+        void SetIDReceivedCallback(std::function<void(LMP_Device*, GKV_ID*)> ptrDeviceIDCallback);
         void SetCustomPacketParamReceivedCallback(std::function<void(LMP_Device*, GKV_CustomDataParam *)> ptrReceivedPacketProcessingFun);
         void SetCustomPacketReceivedCallback(std::function<void(LMP_Device*, GKV_CustomData *)>ptrReceivedPacketProcessingFun);
         void SetADCDataReceivedCallback(std::function<void(LMP_Device*, GKV_ADCData *)> ptrReceivedPacketProcessingFun);

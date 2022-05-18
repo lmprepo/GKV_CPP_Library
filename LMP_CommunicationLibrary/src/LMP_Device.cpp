@@ -123,6 +123,16 @@ namespace Gyrovert
         ptrSettingsPacketCallback = ptrReceivedPacketProcessingFun;
     }
 
+     /**
+    * @name	SetIDReceivedCallback
+    * @brief  Function sets pointer on user function for processing received and parsed id packet (type 0x05) from LMP Device
+    * @param  ptrSendPacketFun - pointer on void-type user callback function that gets pointer on received and parsed Settings structure
+    * @retval no return value.
+    */
+    void LMP_Device::SetIDReceivedCallback(std::function<void(LMP_Device*, GKV_ID*)> ptrReceivedPacketProcessingFun)
+    {
+        ptrDeviceIDCallback = ptrReceivedPacketProcessingFun;
+    }
     /**
       * @name	SetCustomPacketParamReceivedCallback
       * @brief  Function sets pointer on user function for processing received and parsed custom parameters packet (type 0x27) from LMP Device
