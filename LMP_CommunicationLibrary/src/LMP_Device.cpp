@@ -232,6 +232,17 @@ namespace Gyrovert
         ptrExtGNSSDataPacketCallback = ptrReceivedPacketProcessingFun;
     }
 
+
+    /**
+      * @name	SetConfirmPacketReceivedCallback
+      * @brief  Function sets pointer on user function for processing received and parsed request confirmation packet (type 0x00) from LMP Device
+      * @param  ptrReceivedPacketProcessingFun - pointer on void-type user callback function that gets pointer on device object
+      * @retval no return value.
+      */
+    void LMP_Device::SetConfirmPacketReceivedCallback(std::function<void(LMP_Device*)> ptrReceivedPacketProcessingFun)
+    {
+        ptrConfirmPacketCallback = ptrReceivedPacketProcessingFun;
+    }
     /**
       * @name	Configure_Output_Packet
       * @brief  Function inserts selected packet structure into base packet structure, sets values for basic fields and computes crc32.
@@ -984,14 +995,9 @@ namespace Gyrovert
         }
         case GKV_CONFIRM_PACKET:
         {
-            if (CustomPacketParamSentFlag)
+            if (ptrConfirmPacketCallback)
             {
-                CustomPacketParamReceivedFlag = false;
-                CustomPacketParamSentFlag = false;
-            }
-            if (SettingsSentFlag)
-            {
-                SettingsSentFlag = false;
+                ptrConfirmPacketCallback(this);
             }
             break;
         }

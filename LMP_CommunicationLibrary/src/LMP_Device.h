@@ -166,6 +166,7 @@ namespace Gyrovert
         void SetBINSDataReceivedCallback(std::function<void(LMP_Device*, GKV_BINSData *)> ptrReceivedPacketProcessingFun);
         void SetGNSSDataReceivedCallback(std::function<void(LMP_Device*, GKV_GpsData *)>ptrReceivedPacketProcessingFun);
         void SetExtGNSSDataReceivedCallback(std::function<void(LMP_Device*, GKV_GpsDataExt *)>ptrReceivedPacketProcessingFun);
+        void SetConfirmPacketReceivedCallback(std::function<void(LMP_Device*)> ptrReceivedPacketProcessingFun);
         void SetReceiveDataFunction(std::function<char *()>ptrRecPacketFun);
         void clear() { CTR = 0; }
 
@@ -220,6 +221,7 @@ namespace Gyrovert
 
 
         std::function<void(GKV_PacketBase *)>ptrSendFun = nullptr;
+        std::function<void(LMP_Device*)> ptrConfirmPacketCallback = nullptr;
         std::function<void(LMP_Device*, GKV_Settings *)> ptrSettingsPacketCallback=nullptr;
         std::function<void(LMP_Device*, GKV_CustomDataParam *)> ptrCustomPacketParamCallback = nullptr;
         std::function<void(LMP_Device*, GKV_ID *)>ptrDeviceIDCallback = nullptr;
@@ -235,9 +237,7 @@ namespace Gyrovert
 
         bool CheckConnectionRequestedFlag = false;
         bool DeviceIDRequestedFlag = false;
-        bool SettingsSentFlag = false;
         bool SettingsRequestedFlag = false;
-        bool CustomPacketParamSentFlag = false;
         bool CustomPacketParamRequestedFlag = false;
         bool CustomPacketParamReceivedFlag = false;
         bool DataRequestedFlag = false;
