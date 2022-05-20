@@ -124,7 +124,7 @@ namespace Gyrovert
         void SetDefaultAlgorithmPacket();
         void SetCustomAlgorithmPacket();
         void SetCustomPacketParam(uint8_t* param_array_ptr, uint8_t quantity_of_params);
-        void SetDataRatePrescaler(uint8_t rate_prescaler);
+        void SetDataRatePrescaler(uint16_t rate_prescaler);
 
         void SetAccelerationUnits(uint8_t units);
         void SetAngularRateUnits(uint8_t units);

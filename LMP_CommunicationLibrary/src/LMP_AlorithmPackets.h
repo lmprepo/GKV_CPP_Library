@@ -109,9 +109,9 @@ typedef struct __GKV_ADCData
 {
 	uint16_t sample_cnt;										/*	0-65535 counter to detect number of lost packets	*/
 	uint16_t status;											/*	field for detecting errors, sync and algorithm state	*/
-	uint32_t a[3];												/*	accelerometer non-calibrated X Y Z axis data in 24 bit ADC codes	*/
-	uint32_t w[3];												/*	rate sensor non-calibrated	X Y Z axis data in 24 bit ADC codes	*/
-	uint32_t t[4];												/*	X Y Z axis and CPU temperature data in 12 bit ADC	*/
+	int32_t a[3];												/*	accelerometer non-calibrated X Y Z axis data in 24 bit ADC codes	*/
+	int32_t w[3];												/*	rate sensor non-calibrated	X Y Z axis data in 24 bit ADC codes	*/
+	int32_t t[4];												/*	X Y Z axis and CPU temperature data in 12 bit ADC	*/
 }GKV_ADCData;
 
 

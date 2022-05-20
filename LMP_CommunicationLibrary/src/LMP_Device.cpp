@@ -320,12 +320,11 @@ namespace Gyrovert
         * @param  rate_prescaler - quantity of packets filtered
         * @retval no return value.
         */
-    void LMP_Device::SetDataRatePrescaler(uint8_t rate_prescaler)
+    void LMP_Device::SetDataRatePrescaler(uint16_t rate_prescaler)
     {
         GKV_Settings GKV_Settings;
         memset(&GKV_Settings, 0, sizeof(GKV_Settings));
         uint8_t type = GKV_DEV_SETTINGS_PACKET;
-
         if (rate_prescaler <= 1000)
         {
             GKV_Settings.param_mask |= GKV_CHANGE_BASE_FREQ;
